@@ -43,6 +43,24 @@ public class User {
     private LocalDateTime updatedAt;
 
     /**
+     * 保存前にcreatedAtとupdatedAtを設定する
+     */
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    /**
+     * 更新前にupdatedAtを設定する
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
      * リレーション（Phase1では未実装）
      */
     // @OneToMany(mappedBy = "user")

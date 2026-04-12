@@ -1,5 +1,7 @@
 package com.example.studytracker.controller;
 
+import com.example.studytracker.dto.auth.LoginRequest;
+import com.example.studytracker.dto.auth.LoginResponse;
 import com.example.studytracker.dto.auth.RegisterRequest;
 import com.example.studytracker.dto.auth.RegisterResponse;
 import com.example.studytracker.dto.common.ApiResponse;
@@ -52,5 +54,32 @@ public class AuthController {
     public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
         RegisterResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
+    }
+
+    /**
+     * ログイン
+     *
+     * @param request ログインリクエスト
+     * @return ログインレスポンス（JWTトークン）
+     */
+    @PostMapping("/login")
+    @Operation(summary = "ログイン", description = "ユーザー認証を行い、JWTトークンを発行する")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "ログイン成功"
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400",
+            description = "入力不正（バリデーションエラー）"
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "401",
+            description = "認証失敗（ユーザー名またはパスワードが不正）"
+        )
+    })
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

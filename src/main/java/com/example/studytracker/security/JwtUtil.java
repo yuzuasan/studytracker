@@ -5,14 +5,15 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Date;
 
 /**
@@ -28,13 +29,21 @@ public class JwtUtil {
 
     /**
      * シークレットキーからHMAC-SHA256キーを生成する
+     * 短いキーの場合はSHA-256ハッシュで256ビットに拡張する
      *
      * @return SecretKey HMAC-SHA256キー
      */
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(
-                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
-        );
+        try {
+            // シークレットキーをSHA-256でハッシュ化（256ビットに拡張）
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] keyBytes = digest.digest(
+                    jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
+            );
+            return new SecretKeySpec(keyBytes, "HmacSHA256");
+        } catch (Exception e) {
+            throw new RuntimeException("JWT署名キーの生成に失敗しました", e);
+        }
     }
 
     /**

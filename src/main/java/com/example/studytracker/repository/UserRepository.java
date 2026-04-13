@@ -2,6 +2,7 @@ package com.example.studytracker.repository;
 
 import com.example.studytracker.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
  * UserRepository
  * User Entityのデータアクセスを担当
  */
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**

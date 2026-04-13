@@ -1,0 +1,35 @@
+package com.example.studytracker.repository;
+
+import com.example.studytracker.entity.StudyRecord;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * StudyRecordRepository
+ * StudyRecord Entityのデータアクセスを担当
+ */
+@Repository
+public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> {
+
+    /**
+     * ユーザーIDで学習記録を検索する（作成日時降順）
+     * 一覧取得時に使用
+     *
+     * @param userId ユーザーID
+     * @return 学習記録リスト（作成日時降順）
+     */
+    List<StudyRecord> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    /**
+     * IDとユーザーIDで学習記録を検索する
+     * 認可チェック（自分のデータのみアクセス）に使用
+     *
+     * @param id 学習記録ID
+     * @param userId ユーザーID
+     * @return 学習記録（存在しない場合はEmpty）
+     */
+    Optional<StudyRecord> findByIdAndUserId(Long id, Long userId);
+}

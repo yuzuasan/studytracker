@@ -10,11 +10,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+
+import com.example.studytracker.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Spring Securityの設定クラス
@@ -22,7 +26,10 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
      * CORS設定（開発環境用：全許可）
@@ -84,9 +91,11 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll()
                 // 静的リソースを許可
                 .requestMatchers("/webjars/**", "/favicon.ico").permitAll()
-                // それ以外は認証が必要（現在はフィルタ未実装のため実質許可）
+                // それ以外は認証が必要
                 .anyRequest().authenticated()
             )
+            // JWT認証フィルタを追加（UsernamePasswordAuthenticationFilterの前に実行）
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             // H2コンソールのフレーム利用を許可
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
 

@@ -1,5 +1,6 @@
 package com.example.studytracker.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,7 +19,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 import com.example.studytracker.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Spring Securityの設定クラス
@@ -26,10 +26,18 @@ import lombok.RequiredArgsConstructor;
  */
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    /**
+     * ObjectMapperのBean設定
+     * JSON変換に使用
+     *
+     * @return ObjectMapper
+     */
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     /**
      * CORS設定（開発環境用：全許可）
@@ -62,12 +70,14 @@ public class SecurityConfig {
 
     /**
      * セキュリティフィルタチェーンの設定
-     * 
+     *
      * @param http HttpSecurity設定オブジェクト
+     * @param jwtAuthenticationFilter JWT認証フィルタ（引数で受け取り）
      * @return 構築されたSecurityFilterChain
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter) {
         http
             // CSRFを無効化（REST APIのため）
             .csrf(AbstractHttpConfigurer::disable)

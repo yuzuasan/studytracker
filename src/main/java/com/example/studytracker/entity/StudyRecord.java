@@ -6,37 +6,46 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
- * User Entity
- * ユーザー情報（認証・GitHub連携）
+ * StudyRecord Entity
+ * 学習記録のコアデータ
  */
 @Entity
-@Table(name = "users",
-       uniqueConstraints = {
-           @UniqueConstraint(name = "uq_users_username", columnNames = "username")
-       })
+@Table(name = "study_records",
+       indexes = @Index(name = "idx_study_user_date",
+                        columnList = "user_id, study_date"))
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class StudyRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String username;
+    // --- リレーション ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable = false, length = 255)
-    private String password;
+    // --- データ ---
+    @Column(name = "study_date", nullable = false)
+    private LocalDate studyDate;
 
-    @Column(name = "github_username", length = 100)
-    private String githubUsername;
+    @Column(nullable = false, length = 100)
+    private String subject;
 
+    @Column(name = "study_minutes", nullable = false)
+    private Integer studyMinutes;
+
+    @Column(length = 1000)
+    private String memo;
+
+    // --- 監査 ---
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -60,10 +69,4 @@ public class User {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-    /**
-     * リレーション：ユーザーに紐づく学習記録一覧
-     */
-    @OneToMany(mappedBy = "user")
-    private List<StudyRecord> studyRecords;
 }

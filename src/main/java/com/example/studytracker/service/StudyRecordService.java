@@ -2,6 +2,7 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
 import com.example.studytracker.entity.StudyRecord;
 import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.ResourceNotFoundException;
@@ -9,6 +10,8 @@ import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +64,52 @@ public class StudyRecordService {
         // レスポンスを返却
         return StudyRecordCreateResponse.builder()
                 .id(saved.getId())
+                .build();
+    }
+
+    /**
+     * 学習記録一覧を取得する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. userIdで検索（作成日時降順）
+     * 3. EntityリストをDTOに変換
+     * 4. レスポンス返却
+     *
+     * @return 学習記録一覧レスポンス
+     */
+    @Transactional(readOnly = true)
+    public StudyRecordListResponse findAll() {
+        // 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // userIdで学習記録を取得（作成日時降順）
+        // 認可制御：他ユーザーのデータは取得できない
+        List<StudyRecord> studyRecords = studyRecordRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
+        // EntityをDTOに変換
+        List<StudyRecordListResponse.StudyRecordSummary> summaries = studyRecords.stream()
+                .map(this::toSummary)
+                .toList();
+
+        // レスポンスを返却
+        return StudyRecordListResponse.builder()
+                .records(summaries)
+                .build();
+    }
+
+    /**
+     * StudyRecord EntityをStudyRecordSummary DTOに変換する
+     *
+     * @param studyRecord 学習記録Entity
+     * @return 学習記録サマリーDTO
+     */
+    private StudyRecordListResponse.StudyRecordSummary toSummary(StudyRecord studyRecord) {
+        return StudyRecordListResponse.StudyRecordSummary.builder()
+                .id(studyRecord.getId())
+                .date(studyRecord.getStudyDate())
+                .subject(studyRecord.getSubject())
+                .studyMinutes(studyRecord.getStudyMinutes())
                 .build();
     }
 }

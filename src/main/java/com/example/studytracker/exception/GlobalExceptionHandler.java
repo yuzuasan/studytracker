@@ -74,6 +74,24 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * JSONパースエラー（400）
+     * 日付フォーマット不正など、リクエストボディのパース失敗時に呼ばれる
+     */
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+            org.springframework.http.converter.HttpMessageNotReadableException ex) {
+
+        // 日付パースエラーの場合は専用メッセージ
+        String message = "Request body parse error";
+        if (ex.getMessage() != null && ex.getMessage().contains("LocalDate")) {
+            message = "dateはYYYY-MM-DD形式で入力してください";
+        }
+
+        ErrorResponse errorResponse = ErrorResponse.error(message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
      * その他の未ハンドリング例外（500）
      */
     @ExceptionHandler(Exception.class)

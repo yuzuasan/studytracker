@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.ApiResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
 import com.example.studytracker.service.StudyRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,5 +57,28 @@ public class StudyRecordController {
         StudyRecordCreateResponse response = studyRecordService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
+    }
+
+    /**
+     * 学習記録一覧を取得する
+     *
+     * GET /study-records
+     *
+     * @return 学習記録一覧レスポンス
+     */
+    @GetMapping
+    @Operation(summary = "学習記録一覧取得", description = "ログインユーザーの学習記録一覧を取得する")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "取得成功"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "未認証"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<StudyRecordListResponse>> findAll() {
+        StudyRecordListResponse response = studyRecordService.findAll();
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

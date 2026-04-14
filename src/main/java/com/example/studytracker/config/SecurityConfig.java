@@ -3,6 +3,8 @@ package com.example.studytracker.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import com.example.studytracker.dto.common.ErrorResponse;
 import com.example.studytracker.security.JwtAuthenticationFilter;
 
 /**
@@ -73,11 +76,13 @@ public class SecurityConfig {
      *
      * @param http HttpSecurity設定オブジェクト
      * @param jwtAuthenticationFilter JWT認証フィルタ（引数で受け取り）
+     * @param objectMapper JSON変換用ObjectMapper（引数で受け取り）
      * @return 構築されたSecurityFilterChain
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtAuthenticationFilter jwtAuthenticationFilter) {
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   ObjectMapper objectMapper) {
         http
             // CSRFを無効化（REST APIのため）
             .csrf(AbstractHttpConfigurer::disable)
@@ -106,6 +111,15 @@ public class SecurityConfig {
             )
             // JWT認証フィルタを追加（UsernamePasswordAuthenticationFilterの前に実行）
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            // 未認証時のレスポンスを401に設定（デフォルトの403を上書き）
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((request, response, authException) -> {
+                    ErrorResponse errorResponse = ErrorResponse.error("認証が必要です");
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
+                    response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+                })
+            )
             // H2コンソールのフレーム利用を許可
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
 

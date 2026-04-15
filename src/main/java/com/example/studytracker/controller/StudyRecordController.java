@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.ApiResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordDeleteResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -145,6 +147,34 @@ public class StudyRecordController {
             @PathVariable Long id,
             @Valid @RequestBody StudyRecordUpdateRequest request) {
         StudyRecordUpdateResponse response = studyRecordService.update(id, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 学習記録を削除する
+     *
+     * DELETE /study-records/{id}
+     *
+     * @param id 学習記録ID
+     * @return 学習記録削除レスポンス
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "学習記録削除", description = "指定されたIDの学習記録を削除する")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "削除成功"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "未認証"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404", description = "データなし"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<StudyRecordDeleteResponse>> delete(
+            @PathVariable Long id) {
+        StudyRecordDeleteResponse response = studyRecordService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

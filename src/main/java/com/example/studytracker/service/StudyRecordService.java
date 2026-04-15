@@ -2,6 +2,7 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordDeleteResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
@@ -214,6 +215,37 @@ public class StudyRecordService {
         // 6. レスポンスを返却
         return StudyRecordUpdateResponse.builder()
                 .id(saved.getId())
+                .build();
+    }
+
+    /**
+     * 学習記録を削除する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. findByIdAndUserIdで検索（認可制御）
+     * 3. 削除
+     * 4. レスポンス返却
+     *
+     * @param id 学習記録ID
+     * @return 学習記録削除レスポンス
+     * @throws ResourceNotFoundException データが存在しない場合
+     */
+    @Transactional
+    public StudyRecordDeleteResponse delete(Long id) {
+        // 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // findByIdAndUserIdで検索（認可制御：自分のデータのみ削除可能）
+        StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
+
+        // 削除
+        studyRecordRepository.delete(studyRecord);
+
+        // レスポンスを返却
+        return StudyRecordDeleteResponse.builder()
+                .message("deleted")
                 .build();
     }
 }

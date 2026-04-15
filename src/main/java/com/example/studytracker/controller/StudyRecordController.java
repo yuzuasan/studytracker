@@ -5,6 +5,8 @@ import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
+import com.example.studytracker.dto.studyrecord.StudyRecordUpdateResponse;
 import com.example.studytracker.service.StudyRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,6 +112,39 @@ public class StudyRecordController {
     public ResponseEntity<ApiResponse<StudyRecordDetailResponse>> findById(
             @PathVariable Long id) {
         StudyRecordDetailResponse response = studyRecordService.findById(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 学習記録を部分更新する
+     *
+     * PATCH /study-records/{id}
+     *
+     * @param id 学習記録ID
+     * @param request 学習記録更新リクエスト
+     * @return 学習記録更新レスポンス
+     */
+    @PatchMapping("/{id}")
+    @Operation(summary = "学習記録更新", description = "指定されたIDの学習記録を部分更新する。更新したい項目のみ指定してください。")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "更新成功"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "入力不正（空リクエスト含む）"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "未認証"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404", description = "データなし"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<StudyRecordUpdateResponse>> update(
+            @PathVariable Long id,
+            @Valid @RequestBody StudyRecordUpdateRequest request) {
+        StudyRecordUpdateResponse response = studyRecordService.update(id, request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -2,6 +2,7 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
 import com.example.studytracker.entity.StudyRecord;
 import com.example.studytracker.entity.User;
@@ -110,6 +111,49 @@ public class StudyRecordService {
                 .date(studyRecord.getStudyDate())
                 .subject(studyRecord.getSubject())
                 .studyMinutes(studyRecord.getStudyMinutes())
+                .build();
+    }
+
+    /**
+     * 学習記録詳細を取得する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. findByIdAndUserIdで検索
+     * 3. EntityをDTOに変換
+     * 4. レスポンス返却
+     *
+     * @param id 学習記録ID
+     * @return 学習記録詳細レスポンス
+     * @throws ResourceNotFoundException データが存在しない場合
+     */
+    @Transactional(readOnly = true)
+    public StudyRecordDetailResponse findById(Long id) {
+        // 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // findByIdAndUserIdで検索（認可制御）
+        StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
+
+        // EntityをDTOに変換
+        return toDetailResponse(studyRecord);
+    }
+
+    /**
+     * StudyRecord EntityをStudyRecordDetailResponse DTOに変換する
+     *
+     * @param studyRecord 学習記録Entity
+     * @return 学習記録詳細レスポンスDTO
+     */
+    private StudyRecordDetailResponse toDetailResponse(StudyRecord studyRecord) {
+        return StudyRecordDetailResponse.builder()
+                .id(studyRecord.getId())
+                .date(studyRecord.getStudyDate())
+                .subject(studyRecord.getSubject())
+                .studyMinutes(studyRecord.getStudyMinutes())
+                .memo(studyRecord.getMemo())
+                .tags(List.of()) // Phase1ではタグ未実装のため空リストを返却
                 .build();
     }
 }

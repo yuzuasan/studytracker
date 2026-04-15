@@ -146,7 +146,7 @@ public class StudyRecordDetailResponse {
 
 ---
 
-## ■ PUT /study-records/{id}
+## ■ PATCH /study-records/{id}
 
 ### ■ Request DTO（部分更新）
 

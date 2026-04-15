@@ -69,4 +69,42 @@ public class StudyRecord {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // --- 更新用セッター ---
+
+    /**
+     * 学習日を設定する
+     *
+     * @param studyDate 学習日
+     */
+    public void setStudyDate(LocalDate studyDate) {
+        this.studyDate = studyDate;
+    }
+
+    /**
+     * 科目名を設定する
+     *
+     * @param subject 科目名
+     */
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    /**
+     * 学習時間（分）を設定する
+     *
+     * @param studyMinutes 学習時間（分）
+     */
+    public void setStudyMinutes(Integer studyMinutes) {
+        this.studyMinutes = studyMinutes;
+    }
+
+    /**
+     * メモを設定する
+     *
+     * @param memo メモ
+     */
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
 }

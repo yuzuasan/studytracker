@@ -4,8 +4,11 @@ import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
+import com.example.studytracker.dto.studyrecord.StudyRecordUpdateResponse;
 import com.example.studytracker.entity.StudyRecord;
 import com.example.studytracker.entity.User;
+import com.example.studytracker.exception.BadRequestException;
 import com.example.studytracker.exception.ResourceNotFoundException;
 import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.repository.UserRepository;
@@ -154,6 +157,63 @@ public class StudyRecordService {
                 .studyMinutes(studyRecord.getStudyMinutes())
                 .memo(studyRecord.getMemo())
                 .tags(List.of()) // Phase1ではタグ未実装のため空リストを返却
+                .build();
+    }
+
+    /**
+     * 学習記録を部分更新する
+     *
+     * 処理フロー:
+     * 1. リクエストバリデーション（全項目nullチェック）
+     * 2. 認証情報からuserId取得
+     * 3. findByIdAndUserIdで検索（認可制御）
+     * 4. nullでない項目のみ更新
+     * 5. 保存（updatedAtは@PreUpdateで自動更新）
+     * 6. レスポンス返却
+     *
+     * @param id 学習記録ID
+     * @param request 学習記録更新リクエスト
+     * @return 学習記録更新レスポンス
+     * @throws BadRequestException 全項目がnullの場合
+     * @throws ResourceNotFoundException データが存在しない場合
+     */
+    @Transactional
+    public StudyRecordUpdateResponse update(Long id, StudyRecordUpdateRequest request) {
+        // 1. リクエストバリデーション（全項目nullチェック）
+        if (request.getDate() == null &&
+            request.getSubject() == null &&
+            request.getStudyMinutes() == null &&
+            request.getMemo() == null) {
+            throw new BadRequestException("少なくとも1項目は更新項目として指定してください");
+        }
+
+        // 2. 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // 3. findByIdAndUserIdで検索（認可制御：自分のデータのみ更新可能）
+        StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
+
+        // 4. nullでない項目のみ更新
+        if (request.getDate() != null) {
+            studyRecord.setStudyDate(request.getDate());
+        }
+        if (request.getSubject() != null) {
+            studyRecord.setSubject(request.getSubject());
+        }
+        if (request.getStudyMinutes() != null) {
+            studyRecord.setStudyMinutes(request.getStudyMinutes());
+        }
+        if (request.getMemo() != null) {
+            studyRecord.setMemo(request.getMemo());
+        }
+
+        // 5. 保存（updatedAtは@PreUpdateで自動更新される）
+        StudyRecord saved = studyRecordRepository.save(studyRecord);
+
+        // 6. レスポンスを返却
+        return StudyRecordUpdateResponse.builder()
+                .id(saved.getId())
                 .build();
     }
 }

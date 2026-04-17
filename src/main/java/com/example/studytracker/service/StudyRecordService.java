@@ -54,13 +54,19 @@ public class StudyRecordService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("ユーザーが見つかりません"));
 
+        // 入力値の前後空白を除去
+        String trimmedSubject = request.getSubject().trim();
+        String trimmedMemo = request.getMemo() != null
+                ? request.getMemo().trim()
+                : null;
+
         // Entityを生成
         StudyRecord studyRecord = StudyRecord.builder()
                 .user(user)
                 .studyDate(request.getDate())
-                .subject(request.getSubject())
+                .subject(trimmedSubject)
                 .studyMinutes(request.getStudyMinutes())
-                .memo(request.getMemo())
+                .memo(trimmedMemo)
                 .build();
 
         // 保存（createdAt/updatedAtは@PrePersistで自動設定）
@@ -195,18 +201,18 @@ public class StudyRecordService {
         StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
 
-        // 4. nullでない項目のみ更新
+        // 4. nullでない項目のみ更新（文字列は前後空白を除去）
         if (request.getDate() != null) {
             studyRecord.setStudyDate(request.getDate());
         }
         if (request.getSubject() != null) {
-            studyRecord.setSubject(request.getSubject());
+            studyRecord.setSubject(request.getSubject().trim());
         }
         if (request.getStudyMinutes() != null) {
             studyRecord.setStudyMinutes(request.getStudyMinutes());
         }
         if (request.getMemo() != null) {
-            studyRecord.setMemo(request.getMemo());
+            studyRecord.setMemo(request.getMemo().trim());
         }
 
         // 5. 保存（updatedAtは@PreUpdateで自動更新される）

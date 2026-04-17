@@ -33,8 +33,14 @@ public class AuthService {
      */
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+        // 入力値の前後空白を除去
+        String trimmedUsername = request.getUsername().trim();
+        String trimmedGithubUsername = request.getGithubUsername() != null
+                ? request.getGithubUsername().trim()
+                : null;
+
         // username重複チェック
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(trimmedUsername).isPresent()) {
             throw new ConflictException("usernameは既に使用されています");
         }
 
@@ -43,9 +49,9 @@ public class AuthService {
 
         // User生成
         User user = User.builder()
-                .username(request.getUsername())
+                .username(trimmedUsername)
                 .password(hashedPassword)
-                .githubUsername(request.getGithubUsername())
+                .githubUsername(trimmedGithubUsername)
                 .build();
 
         // DB保存

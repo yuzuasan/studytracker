@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.ApiResponse;
 import com.example.studytracker.dto.tag.TagCreateRequest;
 import com.example.studytracker.dto.tag.TagCreateResponse;
+import com.example.studytracker.dto.tag.TagListResponse;
 import com.example.studytracker.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,5 +60,28 @@ public class TagController {
         TagCreateResponse response = tagService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
+    }
+
+    /**
+     * タグ一覧を取得する
+     *
+     * GET /tags
+     *
+     * @return タグ一覧レスポンス
+     */
+    @GetMapping
+    @Operation(summary = "タグ一覧取得", description = "ログイン中のユーザーのタグ一覧を取得する")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "取得成功"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "未認証"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<TagListResponse>> getAll() {
+        TagListResponse response = tagService.getAll();
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -2,6 +2,7 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.tag.TagCreateRequest;
 import com.example.studytracker.dto.tag.TagCreateResponse;
+import com.example.studytracker.dto.tag.TagListResponse;
 import com.example.studytracker.entity.Tag;
 import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.ConflictException;
@@ -12,6 +13,8 @@ import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * タグ関連のビジネスロジックを担当するServiceクラス
@@ -67,6 +70,39 @@ public class TagService {
         // 5. レスポンス返却
         return TagCreateResponse.builder()
                 .id(saved.getId())
+                .build();
+    }
+
+    /**
+     * タグ一覧を取得する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. ユーザーIDに紐づくタグ一覧を取得
+     * 3. レスポンスに変換
+     * 4. 返却
+     *
+     * @return タグ一覧レスポンス
+     */
+    @Transactional(readOnly = true)
+    public TagListResponse getAll() {
+        // 1. 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // 2. ユーザーIDに紐づくタグ一覧を取得
+        List<Tag> tags = tagRepository.findByUserIdOrderByNameAsc(userId);
+
+        // 3. レスポンスに変換
+        List<TagListResponse.TagResponse> tagResponses = tags.stream()
+                .map(tag -> TagListResponse.TagResponse.builder()
+                        .id(tag.getId())
+                        .name(tag.getName())
+                        .build())
+                .toList();
+
+        // 4. 返却
+        return TagListResponse.builder()
+                .tags(tagResponses)
                 .build();
     }
 }

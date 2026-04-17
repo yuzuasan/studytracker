@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.ApiResponse;
 import com.example.studytracker.dto.tag.TagCreateRequest;
 import com.example.studytracker.dto.tag.TagCreateResponse;
+import com.example.studytracker.dto.tag.TagDeleteResponse;
 import com.example.studytracker.dto.tag.TagListResponse;
 import com.example.studytracker.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +14,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +85,33 @@ public class TagController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<TagListResponse>> getAll() {
         TagListResponse response = tagService.getAll();
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * タグを削除する
+     *
+     * DELETE /tags/{id}
+     *
+     * @param id タグID（パスパラメータ）
+     * @return タグ削除レスポンス
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "タグ削除", description = "指定されたタグを削除する")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "削除成功"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401", description = "未認証"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404", description = "タグが存在しない"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<TagDeleteResponse>> delete(@PathVariable Long id) {
+        TagDeleteResponse response = tagService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

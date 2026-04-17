@@ -32,4 +32,14 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
      * @return タグリスト（タグ名昇順）
      */
     List<Tag> findByUserIdOrderByNameAsc(Long userId);
+
+    /**
+     * IDとユーザーIDでタグを検索する
+     * タグ削除時の存在チェック・所有権確認に使用
+     *
+     * @param id タグID
+     * @param userId ユーザーID
+     * @return タグ（存在しない場合はEmpty）
+     */
+    Optional<Tag> findByIdAndUserId(Long id, Long userId);
 }

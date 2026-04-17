@@ -2,6 +2,7 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.tag.TagCreateRequest;
 import com.example.studytracker.dto.tag.TagCreateResponse;
+import com.example.studytracker.dto.tag.TagDeleteResponse;
 import com.example.studytracker.dto.tag.TagListResponse;
 import com.example.studytracker.entity.Tag;
 import com.example.studytracker.entity.User;
@@ -103,6 +104,37 @@ public class TagService {
         // 4. 返却
         return TagListResponse.builder()
                 .tags(tagResponses)
+                .build();
+    }
+
+    /**
+     * タグを削除する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. タグ存在チェック（id + userIdで検索）
+     * 3. タグを削除
+     * 4. レスポンス返却
+     *
+     * @param id タグID
+     * @return タグ削除レスポンス
+     * @throws ResourceNotFoundException タグが存在しない場合
+     */
+    @Transactional
+    public TagDeleteResponse delete(Long id) {
+        // 1. 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // 2. タグ存在チェック（id + userIdで検索して所有権も確認）
+        Tag tag = tagRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("タグが見つかりません"));
+
+        // 3. タグを削除
+        tagRepository.delete(tag);
+
+        // 4. レスポンス返却
+        return TagDeleteResponse.builder()
+                .message("deleted")
                 .build();
     }
 }

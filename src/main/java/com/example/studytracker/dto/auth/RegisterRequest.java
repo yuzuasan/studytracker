@@ -21,7 +21,7 @@ public class RegisterRequest {
      * 必須 / 1〜50文字
      */
     @NotBlank(message = "usernameは必須です")
-    @Size(min = 1, max = 50, message = "usernameは1〜50文字で入力してください")
+    @Size(max = 50, message = "usernameは50文字以内で入力してください")
     private String username;
 
     /**

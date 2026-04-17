@@ -466,8 +466,7 @@ GET /study-records?keyword=Boot
 {
   "status": "success",
   "data": {
-    "id": 1,
-    "name": "spring"
+    "id": 1
   }
 }
 ```
@@ -602,10 +601,10 @@ GET /study-records?keyword=Boot
 
 ### ■ クエリパラメータ
 
-| パラメータ | 型      | フォーマット     |
-| ----- | ------ | ---------- |
-| from  | String | YYYY-MM-DD |
-| to    | String | YYYY-MM-DD |
+| パラメータ | 型      | 条件              |
+| ----- | ------ | --------------- |
+| from  | String | 必須 / YYYY-MM-DD |
+| to    | String | 必須 / YYYY-MM-DD |
 
 ---
 

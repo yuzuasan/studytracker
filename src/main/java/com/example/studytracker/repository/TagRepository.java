@@ -42,4 +42,14 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
      * @return タグ（存在しない場合はEmpty）
      */
     Optional<Tag> findByIdAndUserId(Long id, Long userId);
+
+    /**
+     * ユーザーIDとタグ名一覧でタグを検索する
+     * 学習記録作成・更新時のタグ紐付けに使用
+     *
+     * @param userId ユーザーID
+     * @param names タグ名一覧
+     * @return タグリスト
+     */
+    List<Tag> findByUserIdAndNameIn(Long userId, List<String> names);
 }

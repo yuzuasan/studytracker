@@ -50,5 +50,10 @@ public class StudyRecordListResponse {
          * 学習時間（分）
          */
         private Integer studyMinutes;
+
+        /**
+         * タグ名一覧
+         */
+        private List<String> tags;
     }
 }

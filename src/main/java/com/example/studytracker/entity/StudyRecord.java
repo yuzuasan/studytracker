@@ -120,4 +120,13 @@ public class StudyRecord {
     public void setMemo(String memo) {
         this.memo = memo;
     }
+
+    /**
+     * タグ一覧を設定する
+     *
+     * @param tags タグ一覧
+     */
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 }

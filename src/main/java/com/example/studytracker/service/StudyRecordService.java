@@ -8,15 +8,19 @@ import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateResponse;
 import com.example.studytracker.entity.StudyRecord;
+import com.example.studytracker.entity.Tag;
 import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.BadRequestException;
 import com.example.studytracker.exception.ResourceNotFoundException;
 import com.example.studytracker.repository.StudyRecordRepository;
+import com.example.studytracker.repository.TagRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,7 @@ public class StudyRecordService {
     private final CurrentUserProvider currentUserProvider;
     private final UserRepository userRepository;
     private final StudyRecordRepository studyRecordRepository;
+    private final TagRepository tagRepository;
 
     /**
      * 学習記録を登録する
@@ -68,6 +73,10 @@ public class StudyRecordService {
                 .studyMinutes(request.getStudyMinutes())
                 .memo(trimmedMemo)
                 .build();
+
+        // タグの紐付け処理
+        List<Tag> tags = processTags(userId, request.getTags(), user);
+        studyRecord.setTags(tags);
 
         // 保存（createdAt/updatedAtは@PrePersistで自動設定）
         StudyRecord saved = studyRecordRepository.save(studyRecord);
@@ -214,6 +223,11 @@ public class StudyRecordService {
         if (request.getMemo() != null) {
             studyRecord.setMemo(request.getMemo().trim());
         }
+        if (request.getTags() != null) {
+            // タグは全置換方式で更新
+            List<Tag> newTags = processTags(userId, request.getTags(), studyRecord.getUser());
+            studyRecord.setTags(newTags);
+        }
 
         // 5. 保存（updatedAtは@PreUpdateで自動更新される）
         StudyRecord saved = studyRecordRepository.save(studyRecord);
@@ -253,5 +267,57 @@ public class StudyRecordService {
         return StudyRecordDeleteResponse.builder()
                 .message("deleted")
                 .build();
+    }
+
+    /**
+     * タグ名一覧からタグを取得・作成する
+     * 存在しないタグは自動作成される
+     *
+     * @param userId ユーザーID
+     * @param tagNames タグ名一覧
+     * @param user ユーザーEntity
+     * @return タグリスト
+     */
+    private List<Tag> processTags(Long userId, List<String> tagNames, User user) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // タグ名をtrimして重複を除去
+        List<String> trimmedNames = tagNames.stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .distinct()
+                .toList();
+
+        // 既存タグを取得
+        List<Tag> existingTags = tagRepository.findByUserIdAndNameIn(userId, trimmedNames);
+
+        // 既存タグの名前セットを作成
+        List<String> existingNames = existingTags.stream()
+                .map(Tag::getName)
+                .toList();
+
+        // 新規作成が必要なタグ名を抽出
+        List<String> newTagNames = trimmedNames.stream()
+                .filter(name -> !existingNames.contains(name))
+                .toList();
+
+        // 新規タグを作成して保存
+        List<Tag> newTags = newTagNames.stream()
+                .map(name -> Tag.builder()
+                        .user(user)
+                        .name(name)
+                        .build())
+                .collect(Collectors.toList());
+
+        if (!newTags.isEmpty()) {
+            tagRepository.saveAll(newTags);
+        }
+
+        // 既存タグ + 新規タグを統合して返却
+        List<Tag> result = new ArrayList<>(existingTags);
+        result.addAll(newTags);
+        return result;
     }
 }

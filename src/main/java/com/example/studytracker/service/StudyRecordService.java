@@ -275,7 +275,7 @@ public class StudyRecordService {
         StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
 
-        // 削除
+        // 削除（@ManyToManyの所有側のため、中間テーブルの関連レコードも自動削除される）
         studyRecordRepository.delete(studyRecord);
 
         // レスポンスを返却

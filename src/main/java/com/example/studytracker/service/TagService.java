@@ -4,6 +4,7 @@ import com.example.studytracker.dto.tag.TagCreateRequest;
 import com.example.studytracker.dto.tag.TagCreateResponse;
 import com.example.studytracker.dto.tag.TagDeleteResponse;
 import com.example.studytracker.dto.tag.TagListResponse;
+import com.example.studytracker.entity.StudyRecord;
 import com.example.studytracker.entity.Tag;
 import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.ConflictException;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -113,8 +115,9 @@ public class TagService {
      * 処理フロー:
      * 1. 認証情報からuserId取得
      * 2. タグ存在チェック（id + userIdで検索）
-     * 3. タグを削除
-     * 4. レスポンス返却
+     * 3. タグと学習記録の関連を解除
+     * 4. タグを削除
+     * 5. レスポンス返却
      *
      * @param id タグID
      * @return タグ削除レスポンス
@@ -129,10 +132,17 @@ public class TagService {
         Tag tag = tagRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("タグが見つかりません"));
 
-        // 3. タグを削除
+        // 3. タグと学習記録の関連を解除（中間テーブルのレコード削除）
+        if (tag.getStudyRecords() != null && !tag.getStudyRecords().isEmpty()) {
+            for (StudyRecord studyRecord : new ArrayList<>(tag.getStudyRecords())) {
+                studyRecord.getTags().remove(tag);
+            }
+        }
+
+        // 4. タグを削除
         tagRepository.delete(tag);
 
-        // 4. レスポンス返却
+        // 5. レスポンス返却
         return TagDeleteResponse.builder()
                 .message("deleted")
                 .build();

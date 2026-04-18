@@ -125,11 +125,19 @@ public class StudyRecordService {
      * @return 学習記録サマリーDTO
      */
     private StudyRecordListResponse.StudyRecordSummary toSummary(StudyRecord studyRecord) {
+        // タグ名一覧を抽出
+        List<String> tagNames = studyRecord.getTags() != null
+                ? studyRecord.getTags().stream()
+                        .map(Tag::getName)
+                        .toList()
+                : List.of();
+
         return StudyRecordListResponse.StudyRecordSummary.builder()
                 .id(studyRecord.getId())
                 .date(studyRecord.getStudyDate())
                 .subject(studyRecord.getSubject())
                 .studyMinutes(studyRecord.getStudyMinutes())
+                .tags(tagNames)
                 .build();
     }
 
@@ -166,13 +174,20 @@ public class StudyRecordService {
      * @return 学習記録詳細レスポンスDTO
      */
     private StudyRecordDetailResponse toDetailResponse(StudyRecord studyRecord) {
+        // タグ名一覧を抽出
+        List<String> tagNames = studyRecord.getTags() != null
+                ? studyRecord.getTags().stream()
+                        .map(Tag::getName)
+                        .toList()
+                : List.of();
+
         return StudyRecordDetailResponse.builder()
                 .id(studyRecord.getId())
                 .date(studyRecord.getStudyDate())
                 .subject(studyRecord.getSubject())
                 .studyMinutes(studyRecord.getStudyMinutes())
                 .memo(studyRecord.getMemo())
-                .tags(List.of()) // Phase1ではタグ未実装のため空リストを返却
+                .tags(tagNames)
                 .build();
     }
 

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Tag Entity
@@ -53,6 +54,13 @@ public class Tag {
      */
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    /**
+     * 学習記録との関連（多対多）
+     * StudyRecord側のtagsフィールドによって管理される
+     */
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
+    private List<StudyRecord> studyRecords;
 
     /**
      * 保存前にcreatedAtとupdatedAtを設定する

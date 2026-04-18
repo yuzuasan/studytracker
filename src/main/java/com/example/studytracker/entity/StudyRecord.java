@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * StudyRecord Entity
@@ -31,6 +32,18 @@ public class StudyRecord {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    /**
+     * タグ一覧
+     * 学習記録とタグは多対多の関係
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "study_record_tags",
+        joinColumns = @JoinColumn(name = "study_record_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
 
     // --- データ ---
     @Column(name = "study_date", nullable = false)

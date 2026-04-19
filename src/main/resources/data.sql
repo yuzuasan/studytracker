@@ -3,10 +3,6 @@
 -- users, study_records テーブル
 -- ============================================
 
--- 既存データの削除（クリーンアップ用、必要に応じて使用）
--- DELETE FROM study_records;
--- DELETE FROM users;
-
 -- ============================================
 -- users テストデータ ※パスワードは「password」固定
 -- ============================================
@@ -65,3 +61,73 @@ VALUES (2, CURRENT_DATE - 1, '機械学習', 120, NULL, CURRENT_TIMESTAMP, CURRE
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
 VALUES (3, CURRENT_DATE - 1, 'JavaScript', 60, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+-- ============================================
+-- Phase2 テストデータ
+-- tags, study_record_tags テーブル
+-- ============================================
+
+-- ============================================
+-- tags テストデータ
+-- ============================================
+
+-- ユーザー1（tanaka_taro）のタグ
+INSERT INTO tags (user_id, name, created_at, updated_at)
+VALUES (1, 'Java', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO tags (user_id, name, created_at, updated_at)
+VALUES (1, 'データベース', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO tags (user_id, name, created_at, updated_at)
+VALUES (1, '英語', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ユーザー2（yamamoto_hanako）のタグ
+INSERT INTO tags (user_id, name, created_at, updated_at)
+VALUES (2, 'Python', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO tags (user_id, name, created_at, updated_at)
+VALUES (2, '機械学習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ユーザー3（suzuki_kenji）のタグ
+INSERT INTO tags (user_id, name, created_at, updated_at)
+VALUES (3, 'JavaScript', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ============================================
+-- study_record_tags テストデータ
+-- ============================================
+
+-- ユーザー1の学習記録とタグの関連付け
+-- 学習記録1: Javaプログラミング → Java + データベース（複数タグ）
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (1, 1);
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (1, 2);
+
+-- 学習記録2: データベース → データベースタグ
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (2, 2);
+
+-- 学習記録3: Javaプログラミング → Javaタグ（タグ単体）
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (3, 1);
+
+-- 学習記録4: 英語 → 英語タグ
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (4, 3);
+
+-- 学習記録5: データベース → タグなし（タグ未紐付けのテスト用）
+-- ※この学習記録にはタグを紐付けない
+
+-- ユーザー2の学習記録とタグの関連付け
+-- 学習記録6: Python → Python + 機械学習（複数タグ）
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (6, 4);
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (6, 5);
+
+-- 学習記録7: 機械学習 → 機械学習タグ（タグ単体）
+INSERT INTO study_record_tags (study_record_id, tag_id)
+VALUES (7, 5);
+
+-- ユーザー3の学習記録とタグの関連付け
+-- 学習記録8: JavaScript → タグなし（タグ未紐付けのテスト用）
+-- ※この学習記録にはタグを紐付けない

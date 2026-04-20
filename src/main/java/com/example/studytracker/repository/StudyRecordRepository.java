@@ -2,6 +2,7 @@ package com.example.studytracker.repository;
 
 import com.example.studytracker.entity.StudyRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,9 +11,13 @@ import java.util.Optional;
 /**
  * StudyRecordRepository
  * StudyRecord Entityのデータアクセスを担当
+ *
+ * JpaSpecificationExecutorを継承し、動的クエリ（検索条件による絞り込み）に対応
  */
 @Repository
-public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> {
+public interface StudyRecordRepository
+        extends JpaRepository<StudyRecord, Long>,
+        JpaSpecificationExecutor<StudyRecord> {
 
     /**
      * ユーザーIDで学習記録を検索する（作成日時降順）

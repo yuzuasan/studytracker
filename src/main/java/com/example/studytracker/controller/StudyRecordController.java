@@ -6,6 +6,7 @@ import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDeleteResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordSearchCondition;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateResponse;
 import com.example.studytracker.service.StudyRecordService;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,14 +69,18 @@ public class StudyRecordController {
     }
 
     /**
-     * 学習記録一覧を取得する
+     * 学習記録一覧を取得する（検索条件付き）
      *
      * GET /study-records
+     * GET /study-records?from=2026-04-01&to=2026-04-30
+     * GET /study-records?tag=spring
+     * GET /study-records?keyword=Boot
      *
+     * @param condition 検索条件（クエリパラメータ、任意）
      * @return 学習記録一覧レスポンス
      */
     @GetMapping
-    @Operation(summary = "学習記録一覧取得", description = "ログインユーザーの学習記録一覧を取得する")
+    @Operation(summary = "学習記録一覧取得", description = "ログインユーザーの学習記録一覧を取得する。検索条件（from/to/tag/keyword）で絞り込み可能。")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200", description = "取得成功"
@@ -84,8 +90,9 @@ public class StudyRecordController {
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<StudyRecordListResponse>> findAll() {
-        StudyRecordListResponse response = studyRecordService.findAll();
+    public ResponseEntity<ApiResponse<StudyRecordListResponse>> findAll(
+            @ModelAttribute StudyRecordSearchCondition condition) {
+        StudyRecordListResponse response = studyRecordService.findAll(condition);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

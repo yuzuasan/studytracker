@@ -5,6 +5,7 @@ import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDeleteResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDetailResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordListResponse;
+import com.example.studytracker.dto.studyrecord.StudyRecordSearchCondition;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateResponse;
 import com.example.studytracker.entity.StudyRecord;
@@ -13,6 +14,7 @@ import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.BadRequestException;
 import com.example.studytracker.exception.ResourceNotFoundException;
 import com.example.studytracker.repository.StudyRecordRepository;
+import com.example.studytracker.repository.StudyRecordSpecifications;
 import com.example.studytracker.repository.TagRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,24 +91,29 @@ public class StudyRecordService {
     }
 
     /**
-     * 学習記録一覧を取得する
+     * 学習記録一覧を取得する（検索条件付き）
      *
      * 処理フロー:
      * 1. 認証情報からuserId取得
-     * 2. userIdで検索（作成日時降順）
-     * 3. EntityリストをDTOに変換
-     * 4. レスポンス返却
+     * 2. 検索条件を構築（Specification）
+     * 3. 動的クエリで検索
+     * 4. EntityリストをDTOに変換
+     * 5. レスポンス返却
      *
+     * @param condition 検索条件（null許容）
      * @return 学習記録一覧レスポンス
      */
     @Transactional(readOnly = true)
-    public StudyRecordListResponse findAll() {
+    public StudyRecordListResponse findAll(StudyRecordSearchCondition condition) {
         // 認証情報からuserIdを取得
         Long userId = currentUserProvider.getUserId();
 
-        // userIdで学習記録を取得（作成日時降順）
-        // 認可制御：他ユーザーのデータは取得できない
-        List<StudyRecord> studyRecords = studyRecordRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        // Specificationを構築し、動的クエリで検索
+        // 認可制御：ユーザーIDは必須条件として含まれる
+        // ソート：学習日降順
+        Sort sort = Sort.by("studyDate").descending();
+        List<StudyRecord> studyRecords = studyRecordRepository.findAll(
+                StudyRecordSpecifications.withCondition(userId, condition), sort);
 
         // EntityをDTOに変換
         List<StudyRecordListResponse.StudyRecordSummary> summaries = studyRecords.stream()

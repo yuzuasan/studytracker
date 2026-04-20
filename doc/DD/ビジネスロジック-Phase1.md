@@ -214,7 +214,7 @@ Long userId = currentUserProvider.getUserId();
 ```
 1. 認証情報からuserId取得
 2. userIdで検索
-3. 作成日降順で取得
+3. 学習日降順で取得
 4. DTO変換
 5. レスポンス返却
 ```

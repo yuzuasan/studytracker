@@ -1,10 +1,11 @@
 package com.example.studytracker.controller;
 
 import com.example.studytracker.dto.calendar.CalendarResponse;
-import com.example.studytracker.dto.common.ApiResponse;
+import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.service.CalendarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,18 +43,18 @@ public class CalendarController {
             summary = "学習カレンダー取得",
             description = "指定された年月の学習カレンダーを取得する。year/month未指定時は現在年月を使用。")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "取得成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400", description = "パラメータ不正"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<List<CalendarResponse>>> getCalendar(
+    public ResponseEntity<SuccessResponse<List<CalendarResponse>>> getCalendar(
             @Parameter(description = "年（YYYY形式）", example = "2026")
             @RequestParam(required = false) Integer year,
             @Parameter(description = "月（1〜12）", example = "4")
@@ -61,6 +62,6 @@ public class CalendarController {
 
         List<CalendarResponse> calendar = calendarService.getCalendar(year, month);
 
-        return ResponseEntity.ok(ApiResponse.success(calendar));
+        return ResponseEntity.ok(SuccessResponse.success(calendar));
     }
 }

@@ -1,6 +1,6 @@
 package com.example.studytracker.controller;
 
-import com.example.studytracker.dto.common.ApiResponse;
+import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordCreateResponse;
 import com.example.studytracker.dto.studyrecord.StudyRecordDeleteResponse;
@@ -11,6 +11,7 @@ import com.example.studytracker.dto.studyrecord.StudyRecordUpdateRequest;
 import com.example.studytracker.dto.studyrecord.StudyRecordUpdateResponse;
 import com.example.studytracker.service.StudyRecordService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,22 +51,22 @@ public class StudyRecordController {
     @PostMapping
     @Operation(summary = "学習記録登録", description = "新しい学習記録を登録する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "201", description = "登録成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400", description = "入力不正（バリデーションエラー）"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<StudyRecordCreateResponse>> create(
+    public ResponseEntity<SuccessResponse<StudyRecordCreateResponse>> create(
             @Valid @RequestBody StudyRecordCreateRequest request) {
         StudyRecordCreateResponse response = studyRecordService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+                .body(SuccessResponse.success(response));
     }
 
     /**
@@ -82,18 +83,18 @@ public class StudyRecordController {
     @GetMapping
     @Operation(summary = "学習記録一覧取得", description = "ログインユーザーの学習記録一覧を取得する。検索条件（from/to/tag/keyword）で絞り込み可能。")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "取得成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<StudyRecordListResponse>> findAll(
+    public ResponseEntity<SuccessResponse<StudyRecordListResponse>> findAll(
             @ModelAttribute StudyRecordSearchCondition condition) {
         StudyRecordListResponse response = studyRecordService.findAll(condition);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 
     /**
@@ -107,21 +108,21 @@ public class StudyRecordController {
     @GetMapping("/{id}")
     @Operation(summary = "学習記録詳細取得", description = "指定されたIDの学習記録詳細を取得する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "取得成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404", description = "データなし"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<StudyRecordDetailResponse>> findById(
+    public ResponseEntity<SuccessResponse<StudyRecordDetailResponse>> findById(
             @PathVariable Long id) {
         StudyRecordDetailResponse response = studyRecordService.findById(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 
     /**
@@ -136,25 +137,25 @@ public class StudyRecordController {
     @PatchMapping("/{id}")
     @Operation(summary = "学習記録更新", description = "指定されたIDの学習記録を部分更新する。更新したい項目のみ指定してください。")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "更新成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400", description = "入力不正（空リクエスト含む）"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404", description = "データなし"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<StudyRecordUpdateResponse>> update(
+    public ResponseEntity<SuccessResponse<StudyRecordUpdateResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody StudyRecordUpdateRequest request) {
         StudyRecordUpdateResponse response = studyRecordService.update(id, request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 
     /**
@@ -168,20 +169,20 @@ public class StudyRecordController {
     @DeleteMapping("/{id}")
     @Operation(summary = "学習記録削除", description = "指定されたIDの学習記録を削除する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "削除成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404", description = "データなし"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<StudyRecordDeleteResponse>> delete(
+    public ResponseEntity<SuccessResponse<StudyRecordDeleteResponse>> delete(
             @PathVariable Long id) {
         StudyRecordDeleteResponse response = studyRecordService.delete(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 }

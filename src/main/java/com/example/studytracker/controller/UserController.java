@@ -1,9 +1,10 @@
 package com.example.studytracker.controller;
 
-import com.example.studytracker.dto.common.ApiResponse;
+import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.user.UserResponse;
 import com.example.studytracker.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,16 +37,16 @@ public class UserController {
     @GetMapping("/me")
     @Operation(summary = "自分の情報取得", description = "ログイン中のユーザーの情報を取得する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "取得成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
+    public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser() {
         UserResponse userResponse = userService.getCurrentUser();
-        return ResponseEntity.ok(ApiResponse.success(userResponse));
+        return ResponseEntity.ok(SuccessResponse.success(userResponse));
     }
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ApiResponse<T> {
+public class SuccessResponse<T> {
 
     /**
      * ステータス（固定値: success）
@@ -27,8 +27,8 @@ public class ApiResponse<T> {
     /**
      * 成功レスポンスを生成する
      */
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
+    public static <T> SuccessResponse<T> success(T data) {
+        return SuccessResponse.<T>builder()
                 .status("success")
                 .data(data)
                 .build();

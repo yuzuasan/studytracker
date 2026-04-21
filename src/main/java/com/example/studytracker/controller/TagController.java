@@ -1,12 +1,13 @@
 package com.example.studytracker.controller;
 
-import com.example.studytracker.dto.common.ApiResponse;
+import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.tag.TagCreateRequest;
 import com.example.studytracker.dto.tag.TagCreateResponse;
 import com.example.studytracker.dto.tag.TagDeleteResponse;
 import com.example.studytracker.dto.tag.TagListResponse;
 import com.example.studytracker.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,25 +45,25 @@ public class TagController {
     @PostMapping
     @Operation(summary = "タグ作成", description = "新しいタグを作成する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "201", description = "作成成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "400", description = "入力不正（バリデーションエラー）"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "409", description = "同名タグが既に存在"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<TagCreateResponse>> create(
+    public ResponseEntity<SuccessResponse<TagCreateResponse>> create(
             @Valid @RequestBody TagCreateRequest request) {
         TagCreateResponse response = tagService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+                .body(SuccessResponse.success(response));
     }
 
     /**
@@ -75,17 +76,17 @@ public class TagController {
     @GetMapping
     @Operation(summary = "タグ一覧取得", description = "ログイン中のユーザーのタグ一覧を取得する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "取得成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<TagListResponse>> getAll() {
+    public ResponseEntity<SuccessResponse<TagListResponse>> getAll() {
         TagListResponse response = tagService.getAll();
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 
     /**
@@ -99,19 +100,19 @@ public class TagController {
     @DeleteMapping("/{id}")
     @Operation(summary = "タグ削除", description = "指定されたタグを削除する")
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "200", description = "削除成功"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "401", description = "未認証"
             ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            @ApiResponse(
                     responseCode = "404", description = "タグが存在しない"
             )
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<ApiResponse<TagDeleteResponse>> delete(@PathVariable Long id) {
+    public ResponseEntity<SuccessResponse<TagDeleteResponse>> delete(@PathVariable Long id) {
         TagDeleteResponse response = tagService.delete(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 }

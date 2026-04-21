@@ -4,9 +4,10 @@ import com.example.studytracker.dto.auth.LoginRequest;
 import com.example.studytracker.dto.auth.LoginResponse;
 import com.example.studytracker.dto.auth.RegisterRequest;
 import com.example.studytracker.dto.auth.RegisterResponse;
-import com.example.studytracker.dto.common.ApiResponse;
+import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,22 +39,22 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "ユーザー登録", description = "新しいユーザーを登録する")
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        @ApiResponse(
             responseCode = "201",
             description = "登録成功"
         ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        @ApiResponse(
             responseCode = "400",
             description = "入力不正（バリデーションエラー）"
         ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        @ApiResponse(
             responseCode = "409",
             description = "username重複"
         )
     })
-    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<SuccessResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
         RegisterResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.success(response));
     }
 
     /**
@@ -65,21 +66,21 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "ログイン", description = "ユーザー認証を行い、JWTトークンを発行する")
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        @ApiResponse(
             responseCode = "200",
             description = "ログイン成功"
         ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        @ApiResponse(
             responseCode = "400",
             description = "入力不正（バリデーションエラー）"
         ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        @ApiResponse(
             responseCode = "401",
             description = "認証失敗（ユーザー名またはパスワードが不正）"
         )
     })
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<SuccessResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(SuccessResponse.success(response));
     }
 }

@@ -3,8 +3,12 @@ package com.example.studytracker.repository;
 import com.example.studytracker.entity.StudyRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,4 +31,43 @@ public interface StudyRecordRepository
      * @return 学習記録（存在しない場合はEmpty）
      */
     Optional<StudyRecord> findByIdAndUserId(Long id, Long userId);
+
+    /**
+     * 日付別に学習時間を集計する
+     * カレンダー表示用に使用
+     *
+     * @param userId ユーザーID
+     * @param from 開始日
+     * @param to 終了日
+     * @return 日別学習時間のリスト（日付昇順）
+     */
+    @Query("SELECT sr.studyDate AS date, SUM(sr.studyMinutes) AS totalStudyMinutes " +
+           "FROM StudyRecord sr " +
+           "WHERE sr.user.id = :userId " +
+           "AND sr.studyDate BETWEEN :from AND :to " +
+           "GROUP BY sr.studyDate " +
+           "ORDER BY sr.studyDate ASC")
+    List<DailyStudySummary> findDailyStudySummaryByUserIdAndDateRange(
+            @Param("userId") Long userId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
+
+    /**
+     * 日付別集計結果のプロジェクションインターフェース
+     */
+    interface DailyStudySummary {
+        /**
+         * 日付を取得する
+         *
+         * @return 日付
+         */
+        LocalDate getDate();
+
+        /**
+         * 学習合計時間（分）を取得する
+         *
+         * @return 学習合計時間（分）
+         */
+        Integer getTotalStudyMinutes();
+    }
 }

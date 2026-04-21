@@ -1,6 +1,7 @@
 package com.example.studytracker.service;
 
 import com.example.studytracker.dto.calendar.CalendarResponse;
+import com.example.studytracker.exception.BadRequestException;
 import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,11 @@ public class CalendarService {
      *
      * 処理フロー:
      * 1. 認証情報からuserId取得
-     * 2. year/month未指定時は現在年月を設定
-     * 3. 対象期間（月初〜月末）を算出
-     * 4. 日付別に学習時間を集計
-     * 5. DTOに変換して返却
+     * 2. パラメータバリデーション
+     * 3. year/month未指定時は現在年月を設定
+     * 4. 対象期間（月初〜月末）を算出
+     * 5. 日付別に学習時間を集計
+     * 6. DTOに変換して返却
      *
      * @param year  年（任意、未指定時は現在年）
      * @param month 月（任意、未指定時は現在月）
@@ -39,6 +41,9 @@ public class CalendarService {
     @Transactional(readOnly = true)
     public List<CalendarResponse> getCalendar(Integer year, Integer month) {
         Long userId = currentUserProvider.getUserId();
+
+        // パラメータバリデーション
+        validateYearMonth(year, month);
 
         // year/monthが未指定の場合は現在年月を使用
         YearMonth targetYearMonth = resolveYearMonth(year, month);
@@ -73,5 +78,44 @@ public class CalendarService {
             return YearMonth.now();
         }
         return YearMonth.of(year, month);
+    }
+
+    /**
+     * year/monthパラメータのバリデーションを行う
+     *
+     * 検証ルール:
+     * - yearとmonthは両方指定または両方未指定であること
+     * - yearは2000年〜現在年+1年の範囲であること
+     * - monthは1〜12の範囲であること
+     *
+     * @param year  年
+     * @param month 月
+     * @throws BadRequestException バリデーションエラー時
+     */
+    private void validateYearMonth(Integer year, Integer month) {
+        // 片方だけ指定されている場合はエラー
+        if ((year == null && month != null) || (year != null && month == null)) {
+            throw new BadRequestException("yearとmonthは両方指定するか、両方未指定にしてください");
+        }
+
+        // 両方未指定の場合は検証不要
+        if (year == null && month == null) {
+            return;
+        }
+
+        // yearの範囲を定義
+        final int MIN_YEAR = 2000;
+        final int MAX_YEAR = YearMonth.now().getYear() + 1;
+
+        // yearの検証
+        if (year < MIN_YEAR || year > MAX_YEAR) {
+            throw new BadRequestException(
+                    String.format("yearは%d年〜%d年の範囲で指定してください", MIN_YEAR, MAX_YEAR));
+        }
+
+        // monthの検証
+        if (month < 1 || month > 12) {
+            throw new BadRequestException("monthは1〜12の範囲で指定してください");
+        }
     }
 }

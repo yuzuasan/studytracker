@@ -4,6 +4,7 @@ import com.example.studytracker.dto.calendar.CalendarResponse;
 import com.example.studytracker.exception.BadRequestException;
 import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.security.CurrentUserProvider;
+import com.example.studytracker.util.DateValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class CalendarService {
 
     private final CurrentUserProvider currentUserProvider;
     private final StudyRecordRepository studyRecordRepository;
+    private final DateValidator dateValidator;
 
     /**
      * 指定された年月の学習カレンダーを取得する
@@ -103,19 +105,7 @@ public class CalendarService {
             return;
         }
 
-        // yearの範囲を定義
-        final int MIN_YEAR = 2000;
-        final int MAX_YEAR = YearMonth.now().getYear() + 1;
-
-        // yearの検証
-        if (year < MIN_YEAR || year > MAX_YEAR) {
-            throw new BadRequestException(
-                    String.format("yearは%d年〜%d年の範囲で指定してください", MIN_YEAR, MAX_YEAR));
-        }
-
-        // monthの検証
-        if (month < 1 || month > 12) {
-            throw new BadRequestException("monthは1〜12の範囲で指定してください");
-        }
+        // year・monthの検証（共通バリデーションを使用）
+        dateValidator.validateYearMonth(year, month);
     }
 }

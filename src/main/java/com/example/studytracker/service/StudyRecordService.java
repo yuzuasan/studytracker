@@ -18,6 +18,7 @@ import com.example.studytracker.repository.StudyRecordSpecifications;
 import com.example.studytracker.repository.TagRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
+import com.example.studytracker.util.DateValidator;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class StudyRecordService {
     private final UserRepository userRepository;
     private final StudyRecordRepository studyRecordRepository;
     private final TagRepository tagRepository;
+    private final DateValidator dateValidator;
 
     /**
      * 学習記録を登録する
@@ -55,6 +57,9 @@ public class StudyRecordService {
      */
     @Transactional
     public StudyRecordCreateResponse create(StudyRecordCreateRequest request) {
+        // 学習日の年バリデーション
+        dateValidator.validateYear(request.getDate().getYear());
+
         // 認証情報からuserIdを取得
         Long userId = currentUserProvider.getUserId();
 
@@ -224,6 +229,11 @@ public class StudyRecordService {
             request.getStudyMinutes() == null &&
             request.getMemo() == null) {
             throw new BadRequestException("少なくとも1項目は更新項目として指定してください");
+        }
+
+        // 学習日が指定されている場合は年バリデーションを実行
+        if (request.getDate() != null) {
+            dateValidator.validateYear(request.getDate().getYear());
         }
 
         // 2. 認証情報からuserIdを取得

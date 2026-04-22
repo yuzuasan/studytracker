@@ -63,10 +63,19 @@ public class GlobalExceptionHandler {
         List<ValidationErrorResponse.ValidationError> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(fieldError -> new ValidationErrorResponse.ValidationError(
-                        fieldError.getField(),
-                        fieldError.getDefaultMessage()
-                ))
+                .map(fieldError -> {
+                    String message = fieldError.getDefaultMessage();
+                    // 型変換エラーの場合、かつLocalDateへの変換失敗の場合は専用メッセージ
+                    if (fieldError.getCode() != null && fieldError.getCode().startsWith("typeMismatch")) {
+                        if (message != null && message.contains("LocalDate")) {
+                            message = "YYYY-MM-DD形式で入力してください";
+                        }
+                    }
+                    return new ValidationErrorResponse.ValidationError(
+                            fieldError.getField(),
+                            message
+                    );
+                })
                 .collect(Collectors.toList());
 
         ValidationErrorResponse errorResponse = ValidationErrorResponse.validationError(errors);

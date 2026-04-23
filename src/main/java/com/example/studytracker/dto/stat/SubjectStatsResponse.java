@@ -1,10 +1,16 @@
 package com.example.studytracker.dto.stat;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * 科目別統計レスポンスDTO
  */
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class SubjectStatsResponse {
 

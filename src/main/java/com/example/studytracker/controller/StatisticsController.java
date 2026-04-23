@@ -4,6 +4,7 @@ import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.stat.DailyStatsRequest;
 import com.example.studytracker.dto.stat.DailyStatsResponse;
 import com.example.studytracker.dto.stat.MonthlyStatsResponse;
+import com.example.studytracker.dto.stat.SubjectStatsResponse;
 import com.example.studytracker.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -91,5 +92,32 @@ public class StatisticsController {
         List<MonthlyStatsResponse> monthlyStats = statisticsService.getMonthlyStats();
 
         return ResponseEntity.ok(SuccessResponse.success(monthlyStats));
+    }
+
+    /**
+     * 科目別統計を取得する
+     *
+     * GET /stats/subjects
+     *
+     * @return 科目別統計のリスト
+     */
+    @GetMapping("/subjects")
+    @Operation(
+            summary = "科目別統計取得",
+            description = "科目ごとの学習時間を集計して取得する。学習時間降順で返却される。")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "取得成功"
+            ),
+            @ApiResponse(
+                    responseCode = "401", description = "未認証"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<SuccessResponse<List<SubjectStatsResponse>>> getSubjectStats() {
+
+        List<SubjectStatsResponse> subjectStats = statisticsService.getSubjectStats();
+
+        return ResponseEntity.ok(SuccessResponse.success(subjectStats));
     }
 }

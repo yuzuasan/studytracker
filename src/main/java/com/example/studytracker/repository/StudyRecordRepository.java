@@ -53,6 +53,21 @@ public interface StudyRecordRepository
             @Param("to") LocalDate to);
 
     /**
+     * 月別に学習時間を集計する
+     * 月別統計表示用に使用
+     *
+     * @param userId ユーザーID
+     * @return 月別学習時間のリスト（年月昇順）
+     */
+    @Query("SELECT CONCAT(YEAR(sr.studyDate), '-', FUNCTION('LPAD', MONTH(sr.studyDate), 2, '0')) AS month, " +
+           "SUM(sr.studyMinutes) AS totalStudyMinutes " +
+           "FROM StudyRecord sr " +
+           "WHERE sr.user.id = :userId " +
+           "GROUP BY YEAR(sr.studyDate), MONTH(sr.studyDate) " +
+           "ORDER BY YEAR(sr.studyDate) ASC, MONTH(sr.studyDate) ASC")
+    List<MonthlyStudySummary> findMonthlyStudySummaryByUserId(@Param("userId") Long userId);
+
+    /**
      * 日付別集計結果のプロジェクションインターフェース
      */
     interface DailyStudySummary {
@@ -62,6 +77,25 @@ public interface StudyRecordRepository
          * @return 日付
          */
         LocalDate getDate();
+
+        /**
+         * 学習合計時間（分）を取得する
+         *
+         * @return 学習合計時間（分）
+         */
+        Integer getTotalStudyMinutes();
+    }
+
+    /**
+     * 月別集計結果のプロジェクションインターフェース
+     */
+    interface MonthlyStudySummary {
+        /**
+         * 年月（yyyy-MM形式）を取得する
+         *
+         * @return 年月
+         */
+        String getMonth();
 
         /**
          * 学習合計時間（分）を取得する

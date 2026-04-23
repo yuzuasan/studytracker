@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.stat.DailyStatsRequest;
 import com.example.studytracker.dto.stat.DailyStatsResponse;
+import com.example.studytracker.dto.stat.MonthlyStatsResponse;
 import com.example.studytracker.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -63,5 +64,32 @@ public class StatisticsController {
         List<DailyStatsResponse> dailyStats = statisticsService.getDailyStats(request);
 
         return ResponseEntity.ok(SuccessResponse.success(dailyStats));
+    }
+
+    /**
+     * 月別統計を取得する
+     *
+     * GET /stats/monthly
+     *
+     * @return 月別統計のリスト
+     */
+    @GetMapping("/monthly")
+    @Operation(
+            summary = "月別統計取得",
+            description = "月単位で学習時間を集計して取得する。年月昇順で返却される。")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "取得成功"
+            ),
+            @ApiResponse(
+                    responseCode = "401", description = "未認証"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<SuccessResponse<List<MonthlyStatsResponse>>> getMonthlyStats() {
+
+        List<MonthlyStatsResponse> monthlyStats = statisticsService.getMonthlyStats();
+
+        return ResponseEntity.ok(SuccessResponse.success(monthlyStats));
     }
 }

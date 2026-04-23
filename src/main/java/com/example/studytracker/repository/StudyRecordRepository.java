@@ -56,15 +56,18 @@ public interface StudyRecordRepository
      * 月別に学習時間を集計する
      * 月別統計表示用に使用
      *
+     * 【注意】本クエリはH2データベース固有の関数（FORMATDATETIME）を使用しています。
+     * 本番環境（MySQL/PostgreSQL等）への移行時は、データベースに応じた関数への変更が必要です。
+     *
      * @param userId ユーザーID
      * @return 月別学習時間のリスト（年月昇順）
      */
-    @Query("SELECT CONCAT(YEAR(sr.studyDate), '-', FUNCTION('LPAD', MONTH(sr.studyDate), 2, '0')) AS month, " +
+    @Query("SELECT FUNCTION('FORMATDATETIME', sr.studyDate, 'yyyy-MM') AS month, " +
            "SUM(sr.studyMinutes) AS totalStudyMinutes " +
            "FROM StudyRecord sr " +
            "WHERE sr.user.id = :userId " +
-           "GROUP BY YEAR(sr.studyDate), MONTH(sr.studyDate) " +
-           "ORDER BY YEAR(sr.studyDate) ASC, MONTH(sr.studyDate) ASC")
+           "GROUP BY FUNCTION('FORMATDATETIME', sr.studyDate, 'yyyy-MM') " +
+           "ORDER BY FUNCTION('FORMATDATETIME', sr.studyDate, 'yyyy-MM') ASC")
     List<MonthlyStudySummary> findMonthlyStudySummaryByUserId(@Param("userId") Long userId);
 
     /**

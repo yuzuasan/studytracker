@@ -71,6 +71,21 @@ public interface StudyRecordRepository
     List<MonthlyStudySummary> findMonthlyStudySummaryByUserId(@Param("userId") Long userId);
 
     /**
+     * 科目別に学習時間を集計する
+     * 科目別統計表示用に使用
+     *
+     * @param userId ユーザーID
+     * @return 科目別学習時間のリスト（学習時間降順）
+     */
+    @Query("SELECT sr.subject AS subject, " +
+            "SUM(sr.studyMinutes) AS totalStudyMinutes " +
+            "FROM StudyRecord sr " +
+            "WHERE sr.user.id = :userId " +
+            "GROUP BY sr.subject " +
+            "ORDER BY SUM(sr.studyMinutes) DESC")
+    List<SubjectStudySummary> findSubjectStudySummaryByUserId(@Param("userId") Long userId);
+
+    /**
      * 日付別集計結果のプロジェクションインターフェース
      */
     interface DailyStudySummary {
@@ -99,6 +114,25 @@ public interface StudyRecordRepository
          * @return 年月
          */
         String getMonth();
+
+        /**
+         * 学習合計時間（分）を取得する
+         *
+         * @return 学習合計時間（分）
+         */
+        Integer getTotalStudyMinutes();
+    }
+
+    /**
+     * 科目別集計結果のプロジェクションインターフェース
+     */
+    interface SubjectStudySummary {
+        /**
+         * 科目名を取得する
+         *
+         * @return 科目名
+         */
+        String getSubject();
 
         /**
          * 学習合計時間（分）を取得する

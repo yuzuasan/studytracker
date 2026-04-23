@@ -22,5 +22,5 @@ public class SubjectStatsResponse {
     /**
      * 学習合計時間（分）
      */
-    private Integer totalStudyMinutes;
+    private Long totalStudyMinutes;
 }

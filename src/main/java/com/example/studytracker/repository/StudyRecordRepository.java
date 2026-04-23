@@ -101,7 +101,7 @@ public interface StudyRecordRepository
          *
          * @return 学習合計時間（分）
          */
-        Integer getTotalStudyMinutes();
+        Long getTotalStudyMinutes();
     }
 
     /**
@@ -120,7 +120,7 @@ public interface StudyRecordRepository
          *
          * @return 学習合計時間（分）
          */
-        Integer getTotalStudyMinutes();
+        Long getTotalStudyMinutes();
     }
 
     /**
@@ -139,6 +139,6 @@ public interface StudyRecordRepository
          *
          * @return 学習合計時間（分）
          */
-        Integer getTotalStudyMinutes();
+        Long getTotalStudyMinutes();
     }
 }

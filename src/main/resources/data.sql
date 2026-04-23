@@ -62,6 +62,34 @@ INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, cr
 VALUES (3, CURRENT_DATE - 1, 'JavaScript', 60, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ============================================
+-- 月別統計確認用テストデータ（過去の月）
+-- ============================================
+
+-- ユーザー1（tanaka_taro）の3月の学習記録
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (1, '2026-03-15', 'Javaプログラミング', 180, 'Spring Bootの基礎を学習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (1, '2026-03-20', 'データベース', 120, 'SQLの基本文法を復習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (1, '2026-03-25', '英語', 45, '英単語の暗記', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ユーザー1（tanaka_taro）の2月の学習記録
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (1, '2026-02-10', 'Javaプログラミング', 90, 'Javaの基本構文を学習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (1, '2026-02-28', 'データベース', 60, 'データベース設計の基礎', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ユーザー2（yamamoto_hanako）の3月の学習記録
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (2, '2026-03-05', 'Python', 150, 'NumPyの配列操作を学習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
+VALUES (2, '2026-03-18', '機械学習', 200, '教師あり学習の基礎概念', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ============================================
 -- Phase2 テストデータ
 -- tags, study_record_tags テーブル
 -- ============================================

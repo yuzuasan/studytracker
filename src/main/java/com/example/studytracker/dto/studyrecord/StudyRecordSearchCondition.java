@@ -1,9 +1,6 @@
 package com.example.studytracker.dto.studyrecord;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -17,9 +14,6 @@ import java.time.LocalDate;
  */
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class StudyRecordSearchCondition {
 
     /**
@@ -57,4 +51,24 @@ public class StudyRecordSearchCondition {
      * </p>
      */
     private String keyword;
+
+    /**
+     * タグ名を設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param tag タグ名
+     */
+    public void setTag(String tag) {
+        this.tag = tag == null ? null : tag.trim();
+    }
+
+    /**
+     * メモ検索キーワードを設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param keyword メモ検索キーワード
+     */
+    public void setKeyword(String keyword) {
+        this.keyword = keyword == null ? null : keyword.trim();
+    }
 }

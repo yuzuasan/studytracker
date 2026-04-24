@@ -2,18 +2,12 @@ package com.example.studytracker.dto.tag;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * タグ作成リクエストDTO
  */
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class TagCreateRequest {
 
     /**
@@ -23,4 +17,14 @@ public class TagCreateRequest {
     @NotBlank(message = "nameは必須です")
     @Size(max = 50, message = "nameは50文字で入力してください")
     private String name;
+
+    /**
+     * タグ名を設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param name タグ名
+     */
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
 }

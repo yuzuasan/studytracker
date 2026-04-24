@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -67,19 +68,13 @@ public class StudyRecordService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("ユーザーが見つかりません"));
 
-        // 入力値の前後空白を除去
-        String trimmedSubject = request.getSubject().trim();
-        String trimmedMemo = request.getMemo() != null
-                ? request.getMemo().trim()
-                : null;
-
         // Entityを生成
         StudyRecord studyRecord = StudyRecord.builder()
                 .user(user)
                 .studyDate(request.getDate())
-                .subject(trimmedSubject)
+                .subject(request.getSubject())
                 .studyMinutes(request.getStudyMinutes())
-                .memo(trimmedMemo)
+                .memo(request.getMemo())
                 .build();
 
         // タグの紐付け処理
@@ -243,18 +238,18 @@ public class StudyRecordService {
         StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
 
-        // 4. nullでない項目のみ更新（文字列は前後空白を除去）
+        // 4. nullでない項目のみ更新
         if (request.getDate() != null) {
             studyRecord.setStudyDate(request.getDate());
         }
         if (request.getSubject() != null) {
-            studyRecord.setSubject(request.getSubject().trim());
+            studyRecord.setSubject(request.getSubject());
         }
         if (request.getStudyMinutes() != null) {
             studyRecord.setStudyMinutes(request.getStudyMinutes());
         }
         if (request.getMemo() != null) {
-            studyRecord.setMemo(request.getMemo().trim());
+            studyRecord.setMemo(request.getMemo());
         }
         if (request.getTags() != null) {
             // タグは全置換方式で更新
@@ -316,15 +311,14 @@ public class StudyRecordService {
             return new ArrayList<>();
         }
 
-        // タグ名をtrimして重複を除去
-        List<String> trimmedNames = tagNames.stream()
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
+        // nullを除去して重複を除去
+        List<String> filteredNames = tagNames.stream()
+                .filter(Objects::nonNull)
                 .distinct()
                 .toList();
 
         // 既存タグを取得
-        List<Tag> existingTags = tagRepository.findByUserIdAndNameIn(userId, trimmedNames);
+        List<Tag> existingTags = tagRepository.findByUserIdAndNameIn(userId, filteredNames);
 
         // 既存タグの名前セットを作成
         List<String> existingNames = existingTags.stream()
@@ -332,7 +326,7 @@ public class StudyRecordService {
                 .toList();
 
         // 新規作成が必要なタグ名を抽出
-        List<String> newTagNames = trimmedNames.stream()
+        List<String> newTagNames = filteredNames.stream()
                 .filter(name -> !existingNames.contains(name))
                 .toList();
 

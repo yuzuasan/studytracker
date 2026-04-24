@@ -2,18 +2,12 @@ package com.example.studytracker.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * ログインリクエストDTO
  */
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class LoginRequest {
 
     /**
@@ -31,4 +25,24 @@ public class LoginRequest {
     @NotBlank(message = "passwordは必須です")
     @Size(max = 100, message = "passwordは100文字以内で入力してください")
     private String password;
+
+    /**
+     * ユーザー名を設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param username ユーザー名
+     */
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
+    }
+
+    /**
+     * パスワードを設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param password パスワード
+     */
+    public void setPassword(String password) {
+        this.password = password == null ? null : password.trim();
+    }
 }

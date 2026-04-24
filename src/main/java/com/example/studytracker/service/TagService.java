@@ -35,10 +35,9 @@ public class TagService {
      *
      * 処理フロー:
      * 1. 認証情報からuserId取得
-     * 2. タグ名の前後空白を除去（trim）
-     * 3. 同一ユーザー内で同名タグが存在するか確認
-     * 4. タグを新規作成
-     * 5. レスポンス返却
+     * 2. 同一ユーザー内で同名タグが存在するか確認
+     * 3. タグを新規作成
+     * 4. レスポンス返却
      *
      * @param request タグ作成リクエスト
      * @return タグ作成レスポンス
@@ -50,11 +49,8 @@ public class TagService {
         // 1. 認証情報からuserIdを取得
         Long userId = currentUserProvider.getUserId();
 
-        // 2. タグ名の前後空白を除去（trim）
-        String trimmedName = request.getName().trim();
-
-        // 3. タグ重複チェック
-        if (tagRepository.findByUserIdAndName(userId, trimmedName).isPresent()) {
+        // 2. タグ重複チェック
+        if (tagRepository.findByUserIdAndName(userId, request.getName()).isPresent()) {
             throw new ConflictException("同じ名前のタグが既に存在します");
         }
 
@@ -62,10 +58,10 @@ public class TagService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("ユーザーが見つかりません"));
 
-        // 4. タグを新規作成
+        // 3. タグを新規作成
         Tag tag = Tag.builder()
                 .user(user)
-                .name(trimmedName)
+                .name(request.getName())
                 .build();
 
         Tag saved = tagRepository.save(tag);

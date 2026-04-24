@@ -6,10 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -17,9 +14,6 @@ import java.time.LocalDate;
  * 学習記録登録リクエストDTO
  */
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class StudyRecordCreateRequest {
 
     /**
@@ -60,4 +54,40 @@ public class StudyRecordCreateRequest {
     @Size(max = 10, message = "タグは10件以内で入力してください")
     private List<@NotBlank(message = "タグ名は空にできません")
                  @Size(max = 50, message = "タグ名は50文字以内で入力してください") String> tags;
+
+    /**
+     * 科目名を設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param subject 科目名
+     */
+    public void setSubject(String subject) {
+        this.subject = subject == null ? null : subject.trim();
+    }
+
+    /**
+     * メモを設定する
+     * バリデーション前に前後空白を除去する
+     *
+     * @param memo メモ
+     */
+    public void setMemo(String memo) {
+        this.memo = memo == null ? null : memo.trim();
+    }
+
+    /**
+     * タグ名一覧を設定する
+     * バリデーション前に各タグ名の前後空白を除去する
+     *
+     * @param tags タグ名一覧
+     */
+    public void setTags(List<String> tags) {
+        if (tags == null) {
+            this.tags = null;
+            return;
+        }
+        this.tags = tags.stream()
+                .map(tag -> tag == null ? null : tag.trim())
+                .toList();
+    }
 }

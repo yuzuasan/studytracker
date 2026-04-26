@@ -72,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // JWT検証
         if (!jwtUtil.validateToken(token)) {
-            log.warn("JWTトークンの検証に失敗しました: {}", request.getRequestURI());
+            log.warn("[{}] JWTトークンの検証に失敗しました: {}", this.getClass().getSimpleName(), request.getRequestURI());
 
             // ErrorResponseを使用してレスポンスを生成
             ErrorResponse errorResponse = ErrorResponse.error("認証に失敗しました");
@@ -91,7 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        log.debug("認証成功: userId={}, uri={}", userId, request.getRequestURI());
+        log.debug("[{}] 認証成功: userId={}, uri={}", this.getClass().getSimpleName(), userId, request.getRequestURI());
 
         chain.doFilter(request, response);
     }

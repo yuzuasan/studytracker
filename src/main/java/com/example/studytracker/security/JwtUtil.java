@@ -99,15 +99,15 @@ public class JwtUtil {
             parseToken(token);
             return true;
         } catch (ExpiredJwtException e) {
-            log.warn("JWTトークンが期限切れです");
+            log.warn("[{}] JWTトークンが期限切れです", this.getClass().getSimpleName());
         } catch (SignatureException e) {
-            log.warn("JWT署名が無効です");
+            log.warn("[{}] JWT署名が無効です", this.getClass().getSimpleName());
         } catch (MalformedJwtException e) {
-            log.warn("JWTトークンの形式が不正です");
+            log.warn("[{}] JWTトークンの形式が不正です", this.getClass().getSimpleName());
         } catch (UnsupportedJwtException e) {
-            log.warn("サポートされていないJWTトークンです");
+            log.warn("[{}] サポートされていないJWTトークンです", this.getClass().getSimpleName());
         } catch (IllegalArgumentException e) {
-            log.warn("JWTトークンが空です");
+            log.warn("[{}] JWTトークンが空です", this.getClass().getSimpleName());
         }
         return false;
     }

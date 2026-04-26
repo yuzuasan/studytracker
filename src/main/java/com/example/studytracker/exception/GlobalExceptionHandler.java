@@ -2,6 +2,7 @@ package com.example.studytracker.exception;
 
 import com.example.studytracker.dto.common.ErrorResponse;
 import com.example.studytracker.dto.common.ValidationErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  * グローバル例外ハンドラー
  * アプリケーション全体の例外を統一的にハンドリングする
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,6 +25,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
@@ -32,6 +35,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
@@ -41,6 +45,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -50,6 +55,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
@@ -60,6 +66,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
         List<ValidationErrorResponse.ValidationError> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -89,6 +96,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
 
         // 日付パースエラーの場合は専用メッセージ
         String message = "Request body parse error";
@@ -105,6 +113,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        log.error("[{}] error: {}", this.getClass().getSimpleName(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.error("Internal server error");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }

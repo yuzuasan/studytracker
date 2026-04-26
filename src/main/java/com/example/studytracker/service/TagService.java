@@ -13,6 +13,7 @@ import com.example.studytracker.repository.TagRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * タグ関連のビジネスロジックを担当するServiceクラス
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TagService {
@@ -66,6 +68,8 @@ public class TagService {
 
         Tag saved = tagRepository.save(tag);
 
+        log.debug("[{}] create result: id={}", this.getClass().getSimpleName(), saved.getId());
+
         // 5. レスポンス返却
         return TagCreateResponse.builder()
                 .id(saved.getId())
@@ -100,9 +104,12 @@ public class TagService {
                 .toList();
 
         // 4. 返却
-        return TagListResponse.builder()
+        TagListResponse result = TagListResponse.builder()
                 .tags(tagResponses)
                 .build();
+
+        log.debug("[{}] getAll result: count={}", this.getClass().getSimpleName(), tagResponses.size());
+        return result;
     }
 
     /**
@@ -137,6 +144,8 @@ public class TagService {
 
         // 4. タグを削除
         tagRepository.delete(tag);
+
+        log.debug("[{}] delete result: id={}", this.getClass().getSimpleName(), id);
 
         // 5. レスポンス返却
         return TagDeleteResponse.builder()

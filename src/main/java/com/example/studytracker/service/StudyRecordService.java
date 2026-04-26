@@ -20,6 +20,7 @@ import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import com.example.studytracker.util.DateValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 学習記録関連のビジネスロジックを担当するServiceクラス
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StudyRecordService {
@@ -84,6 +86,8 @@ public class StudyRecordService {
         // 保存（createdAt/updatedAtは@PrePersistで自動設定）
         StudyRecord saved = studyRecordRepository.save(studyRecord);
 
+        log.debug("[{}] create result: id={}", this.getClass().getSimpleName(), saved.getId());
+
         // レスポンスを返却
         return StudyRecordCreateResponse.builder()
                 .id(saved.getId())
@@ -121,9 +125,12 @@ public class StudyRecordService {
                 .toList();
 
         // レスポンスを返却
-        return StudyRecordListResponse.builder()
+        StudyRecordListResponse result = StudyRecordListResponse.builder()
                 .records(summaries)
                 .build();
+
+        log.debug("[{}] findAll result: count={}", this.getClass().getSimpleName(), summaries.size());
+        return result;
     }
 
     /**
@@ -170,6 +177,8 @@ public class StudyRecordService {
         // findByIdAndUserIdで検索（認可制御）
         StudyRecord studyRecord = studyRecordRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("学習記録が見つかりません"));
+
+        log.debug("[{}] findById result: id={}", this.getClass().getSimpleName(), id);
 
         // EntityをDTOに変換
         return toDetailResponse(studyRecord);
@@ -260,6 +269,8 @@ public class StudyRecordService {
         // 5. 保存（updatedAtは@PreUpdateで自動更新される）
         StudyRecord saved = studyRecordRepository.save(studyRecord);
 
+        log.debug("[{}] update result: id={}", this.getClass().getSimpleName(), saved.getId());
+
         // 6. レスポンスを返却
         return StudyRecordUpdateResponse.builder()
                 .id(saved.getId())
@@ -290,6 +301,8 @@ public class StudyRecordService {
 
         // 削除（@ManyToManyの所有側のため、中間テーブルの関連レコードも自動削除される）
         studyRecordRepository.delete(studyRecord);
+
+        log.debug("[{}] delete result: id={}", this.getClass().getSimpleName(), id);
 
         // レスポンスを返却
         return StudyRecordDeleteResponse.builder()

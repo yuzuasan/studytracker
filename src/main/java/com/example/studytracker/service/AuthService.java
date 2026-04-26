@@ -10,6 +10,7 @@ import com.example.studytracker.exception.UnauthorizedException;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 認証関連のビジネスロジックを担当するService
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -51,6 +53,8 @@ public class AuthService {
         // DB保存
         User savedUser = userRepository.save(user);
 
+        log.debug("[{}] register result: userId={}", this.getClass().getSimpleName(), savedUser.getId());
+
         // レスポンス返却
         return RegisterResponse.builder()
                 .userId(savedUser.getId())
@@ -80,6 +84,8 @@ public class AuthService {
 
         // JWT生成
         String token = jwtUtil.generateToken(user.getId().toString());
+
+        log.debug("[{}] login result: tokenType={}", this.getClass().getSimpleName(), "Bearer");
 
         // レスポンス返却
         return LoginResponse.builder()

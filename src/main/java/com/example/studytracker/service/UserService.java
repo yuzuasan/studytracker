@@ -6,12 +6,14 @@ import com.example.studytracker.exception.ResourceNotFoundException;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ユーザー関連のビジネスロジックを担当するServiceクラス
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -41,10 +43,13 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("ユーザーが見つかりません"));
 
         // DTOに変換して返却
-        return UserResponse.builder()
+        UserResponse result = UserResponse.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
                 .githubUsername(user.getGithubUsername())
                 .build();
+
+        log.debug("[{}] getCurrentUser result: userId={}", this.getClass().getSimpleName(), result.getUserId());
+        return result;
     }
 }

@@ -7,6 +7,7 @@ import com.example.studytracker.dto.stat.SubjectStatsResponse;
 import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 /**
  * 学習統計関連のビジネスロジックを担当するServiceクラス
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StatisticsService {
@@ -46,12 +48,15 @@ public class StatisticsService {
                 studyRecordRepository.findDailyStudySummaryByUserIdAndDateRange(userId, from, to);
 
         // DTOに変換
-        return summaries.stream()
+        List<DailyStatsResponse> result = summaries.stream()
                 .map(summary -> DailyStatsResponse.builder()
                         .date(summary.getDate())
                         .totalStudyMinutes(summary.getTotalStudyMinutes())
                         .build())
                 .collect(Collectors.toList());
+
+        log.debug("[{}] getDailyStats result: count={}", this.getClass().getSimpleName(), result.size());
+        return result;
     }
 
     /**
@@ -73,12 +78,15 @@ public class StatisticsService {
                 studyRecordRepository.findMonthlyStudySummaryByUserId(userId);
 
         // DTOに変換
-        return summaries.stream()
+        List<MonthlyStatsResponse> result = summaries.stream()
                 .map(summary -> MonthlyStatsResponse.builder()
                         .month(summary.getMonth())
                         .totalStudyMinutes(summary.getTotalStudyMinutes())
                         .build())
                 .collect(Collectors.toList());
+
+        log.debug("[{}] getMonthlyStats result: count={}", this.getClass().getSimpleName(), result.size());
+        return result;
     }
 
     /**
@@ -100,11 +108,14 @@ public class StatisticsService {
                 studyRecordRepository.findSubjectStudySummaryByUserId(userId);
 
         // DTOに変換
-        return summaries.stream()
+        List<SubjectStatsResponse> result = summaries.stream()
                 .map(summary -> SubjectStatsResponse.builder()
                         .subject(summary.getSubject())
                         .totalStudyMinutes(summary.getTotalStudyMinutes())
                         .build())
                 .collect(Collectors.toList());
+
+        log.debug("[{}] getSubjectStats result: count={}", this.getClass().getSimpleName(), result.size());
+        return result;
     }
 }

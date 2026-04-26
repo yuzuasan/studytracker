@@ -6,6 +6,7 @@ import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import com.example.studytracker.util.DateValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 /**
  * 学習カレンダー関連のビジネスロジックを担当するServiceクラス
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CalendarService {
@@ -59,12 +61,15 @@ public class CalendarService {
                 studyRecordRepository.findDailyStudySummaryByUserIdAndDateRange(userId, from, to);
 
         // DTOに変換
-        return summaries.stream()
+        List<CalendarResponse> result = summaries.stream()
                 .map(summary -> CalendarResponse.builder()
                         .date(summary.getDate())
                         .totalStudyMinutes(summary.getTotalStudyMinutes())
                         .build())
                 .collect(Collectors.toList());
+
+        log.debug("[{}] getCalendar result: count={}", this.getClass().getSimpleName(), result.size());
+        return result;
     }
 
     /**

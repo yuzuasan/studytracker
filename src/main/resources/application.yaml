@@ -27,3 +27,8 @@ server:
 jwt:
   secret: studytracker-secret-key
   expiration: 3600000
+
+logging:
+  level:
+    root: INFO
+    com.example.studytracker: DEBUG

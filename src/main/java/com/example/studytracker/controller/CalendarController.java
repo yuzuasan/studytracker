@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import java.util.List;
 /**
  * 学習カレンダー関連のAPIエンドポイントを提供するControllerクラス
  */
+@Slf4j
 @RestController
 @RequestMapping("/calendar")
 @RequiredArgsConstructor
@@ -60,6 +62,7 @@ public class CalendarController {
             @Parameter(description = "月（1〜12）", example = "4")
             @RequestParam(required = false) Integer month) {
 
+        log.debug("[{}] getCalendar request: year={}, month={}", this.getClass().getSimpleName(), year, month);
         List<CalendarResponse> calendar = calendarService.getCalendar(year, month);
 
         return ResponseEntity.ok(SuccessResponse.success(calendar));

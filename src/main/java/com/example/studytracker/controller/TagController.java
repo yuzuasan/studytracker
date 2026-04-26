@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * タグ管理関連のAPIエンドポイントを提供するControllerクラス
  */
+@Slf4j
 @RestController
 @RequestMapping("/tags")
 @RequiredArgsConstructor
@@ -61,6 +63,7 @@ public class TagController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<TagCreateResponse>> create(
             @Valid @RequestBody TagCreateRequest request) {
+        log.debug("[{}] create request: name={}", this.getClass().getSimpleName(), request.getName());
         TagCreateResponse response = tagService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessResponse.success(response));
@@ -85,6 +88,7 @@ public class TagController {
     })
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<TagListResponse>> getAll() {
+        log.debug("[{}] getAll request", this.getClass().getSimpleName());
         TagListResponse response = tagService.getAll();
         return ResponseEntity.ok(SuccessResponse.success(response));
     }
@@ -112,6 +116,7 @@ public class TagController {
     })
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<TagDeleteResponse>> delete(@PathVariable Long id) {
+        log.debug("[{}] delete request: id={}", this.getClass().getSimpleName(), id);
         TagDeleteResponse response = tagService.delete(id);
         return ResponseEntity.ok(SuccessResponse.success(response));
     }

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 認証関連のController
  */
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -53,6 +55,7 @@ public class AuthController {
         )
     })
     public ResponseEntity<SuccessResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        log.debug("[{}] register request: username={}", this.getClass().getSimpleName(), request.getUsername());
         RegisterResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.success(response));
     }
@@ -80,6 +83,7 @@ public class AuthController {
         )
     })
     public ResponseEntity<SuccessResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+        log.debug("[{}] login request: username={}", this.getClass().getSimpleName(), request.getUsername());
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(SuccessResponse.success(response));
     }

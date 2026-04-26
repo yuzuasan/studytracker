@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ import java.util.List;
 /**
  * 学習統計関連のAPIエンドポイントを提供するControllerクラス
  */
+@Slf4j
 @RestController
 @RequestMapping("/stats")
 @RequiredArgsConstructor
@@ -62,6 +64,7 @@ public class StatisticsController {
             @Parameter(description = "日別統計リクエスト", required = true)
             @Valid @ModelAttribute DailyStatsRequest request) {
 
+        log.debug("[{}] getDailyStats request: from={}, to={}", this.getClass().getSimpleName(), request.getFrom(), request.getTo());
         List<DailyStatsResponse> dailyStats = statisticsService.getDailyStats(request);
 
         return ResponseEntity.ok(SuccessResponse.success(dailyStats));
@@ -89,6 +92,7 @@ public class StatisticsController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<List<MonthlyStatsResponse>>> getMonthlyStats() {
 
+        log.debug("[{}] getMonthlyStats request", this.getClass().getSimpleName());
         List<MonthlyStatsResponse> monthlyStats = statisticsService.getMonthlyStats();
 
         return ResponseEntity.ok(SuccessResponse.success(monthlyStats));
@@ -116,6 +120,7 @@ public class StatisticsController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<List<SubjectStatsResponse>>> getSubjectStats() {
 
+        log.debug("[{}] getSubjectStats request", this.getClass().getSimpleName());
         List<SubjectStatsResponse> subjectStats = statisticsService.getSubjectStats();
 
         return ResponseEntity.ok(SuccessResponse.success(subjectStats));

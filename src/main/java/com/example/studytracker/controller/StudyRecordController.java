@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 学習記録関連のAPIエンドポイントを提供するControllerクラス
  */
+@Slf4j
 @RestController
 @RequestMapping("/study-records")
 @RequiredArgsConstructor
@@ -64,6 +66,8 @@ public class StudyRecordController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<StudyRecordCreateResponse>> create(
             @Valid @RequestBody StudyRecordCreateRequest request) {
+        log.debug("[{}] create request: date={}, studyMinutes={}", 
+                this.getClass().getSimpleName(), request.getDate(), request.getStudyMinutes());
         StudyRecordCreateResponse response = studyRecordService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessResponse.success(response));
@@ -93,6 +97,8 @@ public class StudyRecordController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<StudyRecordListResponse>> findAll(
             @ModelAttribute StudyRecordSearchCondition condition) {
+        log.debug("[{}] findAll request: from={}, to={}, tag={}, keyword={}", 
+                this.getClass().getSimpleName(), condition.getFrom(), condition.getTo(), condition.getTag(), condition.getKeyword());
         StudyRecordListResponse response = studyRecordService.findAll(condition);
         return ResponseEntity.ok(SuccessResponse.success(response));
     }
@@ -121,6 +127,7 @@ public class StudyRecordController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<StudyRecordDetailResponse>> findById(
             @PathVariable Long id) {
+        log.debug("[{}] findById request: id={}", this.getClass().getSimpleName(), id);
         StudyRecordDetailResponse response = studyRecordService.findById(id);
         return ResponseEntity.ok(SuccessResponse.success(response));
     }
@@ -154,6 +161,7 @@ public class StudyRecordController {
     public ResponseEntity<SuccessResponse<StudyRecordUpdateResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody StudyRecordUpdateRequest request) {
+        log.debug("[{}] update request: id={}", this.getClass().getSimpleName(), id);
         StudyRecordUpdateResponse response = studyRecordService.update(id, request);
         return ResponseEntity.ok(SuccessResponse.success(response));
     }
@@ -182,6 +190,7 @@ public class StudyRecordController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<StudyRecordDeleteResponse>> delete(
             @PathVariable Long id) {
+        log.debug("[{}] delete request: id={}", this.getClass().getSimpleName(), id);
         StudyRecordDeleteResponse response = studyRecordService.delete(id);
         return ResponseEntity.ok(SuccessResponse.success(response));
     }

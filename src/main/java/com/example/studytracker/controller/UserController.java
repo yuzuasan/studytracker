@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * 設計書「APIリクエスト・レスポンス.md」3.1 自分の情報取得 に基づく実装
  */
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -46,6 +48,7 @@ public class UserController {
     })
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SuccessResponse<UserResponse>> getCurrentUser() {
+        log.debug("[{}] getCurrentUser request", this.getClass().getSimpleName());
         UserResponse userResponse = userService.getCurrentUser();
         return ResponseEntity.ok(SuccessResponse.success(userResponse));
     }

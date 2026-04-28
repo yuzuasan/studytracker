@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.goal.GoalCreateRequest;
 import com.example.studytracker.dto.goal.GoalCreateResponse;
+import com.example.studytracker.dto.goal.GoalListResponse;
 import com.example.studytracker.service.GoalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +64,31 @@ public class GoalController {
                 this.getClass().getSimpleName(), request.getMonth(), request.getTargetMinutes());
         GoalCreateResponse response = goalService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
+                .body(SuccessResponse.success(response));
+    }
+
+    /**
+     * 目標一覧を取得する
+     *
+     * GET /goals
+     *
+     * @return 目標一覧レスポンス
+     */
+    @GetMapping
+    @Operation(summary = "目標取得", description = "目標一覧と達成状況を取得する")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "取得成功"
+            ),
+            @ApiResponse(
+                    responseCode = "401", description = "未認証"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<SuccessResponse<GoalListResponse>> getAllGoals() {
+        log.debug("[{}] getAllGoals request", this.getClass().getSimpleName());
+        GoalListResponse response = goalService.getAllGoals();
+        return ResponseEntity.ok()
                 .body(SuccessResponse.success(response));
     }
 }

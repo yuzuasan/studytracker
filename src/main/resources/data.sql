@@ -27,39 +27,39 @@ VALUES ('suzuki_kenji', '$2a$10$oKnu1dnKu37igYotc2EySuwRnT1TBkejDtHevb07xRkvwg5A
 
 -- 今日の学習記録（メモあり）
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (1, CURRENT_DATE, 'Javaプログラミング', 120, 'Spring Bootのコントローラー層を学習。REST APIの設計について復習した。', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, '2026-04-28', 'Javaプログラミング', 120, 'Spring Bootのコントローラー層を学習。REST APIの設計について復習した。', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 昨日の学習記録（メモなし）
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (1, CURRENT_DATE - 1, 'データベース', 90, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, '2026-04-27', 'データベース', 90, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 2日前の学習記録
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (1, CURRENT_DATE - 2, 'Javaプログラミング', 60, 'Stream APIの基本操作を練習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, '2026-04-26', 'Javaプログラミング', 60, 'Stream APIの基本操作を練習', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 3日前の学習記録
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (1, CURRENT_DATE - 3, '英語', 30, 'TOEICのリスニング対策', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, '2026-04-25', '英語', 30, 'TOEICのリスニング対策', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 1週間前の学習記録
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (1, CURRENT_DATE - 7, 'データベース', 150, 'MySQLのインデックス設計について学習。EXPLAINの使い方を理解した。', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, '2026-04-21', 'データベース', 150, 'MySQLのインデックス設計について学習。EXPLAINの使い方を理解した。', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ユーザー2（yamamoto_hanako）の学習記録
 
 -- 今日の学習記録
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (2, CURRENT_DATE, 'Python', 45, 'pandasの基本操作', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (2, '2026-04-28', 'Python', 45, 'pandasの基本操作', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 昨日の学習記録
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (2, CURRENT_DATE - 1, '機械学習', 120, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (2, '2026-04-27', '機械学習', 120, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ユーザー3（suzuki_kenji）の学習記録
 
 -- 最小限のデータのみ
 INSERT INTO study_records (user_id, study_date, subject, study_minutes, memo, created_at, updated_at)
-VALUES (3, CURRENT_DATE - 1, 'JavaScript', 60, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (3, '2026-04-27', 'JavaScript', 60, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ============================================
 -- 月別統計確認用テストデータ（過去の月）
@@ -159,3 +159,31 @@ VALUES (7, 5);
 -- ユーザー3の学習記録とタグの関連付け
 -- 学習記録8: JavaScript → タグなし（タグ未紐付けのテスト用）
 -- ※この学習記録にはタグを紐付けない
+
+-- ============================================
+-- Phase4 テストデータ
+-- goals テーブル
+-- ============================================
+
+-- ============================================
+-- goals テストデータ
+-- ============================================
+
+-- ユーザー1（tanaka_taro）の目標
+-- 2026年4月の目標
+INSERT INTO goals (user_id, target_month, target_minutes, created_at, updated_at)
+VALUES (1, '2026-04', 3000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- 2026年3月の目標
+INSERT INTO goals (user_id, target_month, target_minutes, created_at, updated_at)
+VALUES (1, '2026-03', 2500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ユーザー2（yamamoto_hanako）の目標
+-- 2026年4月の目標
+INSERT INTO goals (user_id, target_month, target_minutes, created_at, updated_at)
+VALUES (2, '2026-04', 2000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- ユーザー3（suzuki_kenji）の目標
+-- 2026年4月の目標
+INSERT INTO goals (user_id, target_month, target_minutes, created_at, updated_at)
+VALUES (3, '2026-04', 1500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

@@ -86,6 +86,24 @@ public interface StudyRecordRepository
     List<SubjectStudySummary> findSubjectStudySummaryByUserId(@Param("userId") Long userId);
 
     /**
+     * 指定期間の学習時間を集計する
+     * 目標達成状況の計算に使用
+     *
+     * @param userId ユーザーID
+     * @param from 開始日
+     * @param to 終了日
+     * @return 学習時間の合計（分）、該当データがない場合はnull
+     */
+    @Query("SELECT SUM(sr.studyMinutes) " +
+           "FROM StudyRecord sr " +
+           "WHERE sr.user.id = :userId " +
+           "AND sr.studyDate BETWEEN :from AND :to")
+    Long findTotalStudyMinutesByUserIdAndDateRange(
+            @Param("userId") Long userId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
+
+    /**
      * 日付別集計結果のプロジェクションインターフェース
      */
     interface DailyStudySummary {

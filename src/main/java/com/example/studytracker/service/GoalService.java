@@ -2,11 +2,13 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.goal.GoalCreateRequest;
 import com.example.studytracker.dto.goal.GoalCreateResponse;
+import com.example.studytracker.dto.goal.GoalListResponse;
 import com.example.studytracker.entity.Goal;
 import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.ConflictException;
 import com.example.studytracker.exception.ResourceNotFoundException;
 import com.example.studytracker.repository.GoalRepository;
+import com.example.studytracker.repository.StudyRecordRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
 import com.example.studytracker.util.DateValidator;
@@ -14,6 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
 
 /**
  * 目標管理関連のビジネスロジックを担当するServiceクラス
@@ -26,6 +32,7 @@ public class GoalService {
     private final CurrentUserProvider currentUserProvider;
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
+    private final StudyRecordRepository studyRecordRepository;
     private final DateValidator dateValidator;
 
     /**
@@ -79,6 +86,66 @@ public class GoalService {
         // 6. レスポンス返却
         return GoalCreateResponse.builder()
                 .id(saved.getId())
+                .build();
+    }
+
+    /**
+     * 目標一覧を取得する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. 目標一覧を取得（user_idで絞る、month DESC）
+     * 3. 各目標について以下を実施
+     *    - monthから対象期間を算出（開始日：YYYY-MM-01、終了日：月末）
+     *    - StudyRecordから対象期間の学習時間を集計（SUM）
+     *    - achievedMinutesとして設定
+     * 4. DTOに変換して返却
+     *
+     * @return 目標一覧レスポンス
+     */
+    @Transactional(readOnly = true)
+    public GoalListResponse getAllGoals() {
+        // 1. 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // 2. 目標一覧を取得（対象年月降順）
+        List<Goal> goals = goalRepository.findByUserIdOrderByTargetMonthDesc(userId);
+
+        // 3. 各目標について達成状況を計算
+        List<GoalListResponse.GoalSummary> goalSummaries = goals.stream()
+                .map(goal -> {
+                    // monthから対象期間を算出
+                    String[] yearMonth = goal.getTargetMonth().split("-");
+                    int year = Integer.parseInt(yearMonth[0]);
+                    int month = Integer.parseInt(yearMonth[1]);
+
+                    // 開始日：YYYY-MM-01
+                    LocalDate fromDate = LocalDate.of(year, month, 1);
+                    // 終了日：月末
+                    LocalDate toDate = YearMonth.of(year, month).atEndOfMonth();
+
+                    // StudyRecordから対象期間の学習時間を集計
+                    Long totalMinutes = studyRecordRepository.findTotalStudyMinutesByUserIdAndDateRange(
+                            userId, fromDate, toDate);
+
+                    // 該当データがない場合は0として扱う
+                    Integer achievedMinutes = totalMinutes != null ? totalMinutes.intValue() : 0;
+
+                    // DTOに変換
+                    return GoalListResponse.GoalSummary.builder()
+                            .id(goal.getId())
+                            .month(goal.getTargetMonth())
+                            .targetMinutes(goal.getTargetMinutes())
+                            .achievedMinutes(achievedMinutes)
+                            .build();
+                })
+                .toList();
+
+        log.debug("[{}] getAllGoals result: count={}", this.getClass().getSimpleName(), goalSummaries.size());
+
+        // 4. レスポンス返却
+        return GoalListResponse.builder()
+                .goals(goalSummaries)
                 .build();
     }
 }

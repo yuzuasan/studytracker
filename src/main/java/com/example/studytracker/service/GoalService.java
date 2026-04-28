@@ -9,6 +9,7 @@ import com.example.studytracker.exception.ResourceNotFoundException;
 import com.example.studytracker.repository.GoalRepository;
 import com.example.studytracker.repository.UserRepository;
 import com.example.studytracker.security.CurrentUserProvider;
+import com.example.studytracker.util.DateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class GoalService {
     private final CurrentUserProvider currentUserProvider;
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
+    private final DateValidator dateValidator;
 
     /**
      * 目標を作成する
@@ -46,6 +48,12 @@ public class GoalService {
     public GoalCreateResponse create(GoalCreateRequest request) {
         // 1. 認証情報からuserIdを取得
         Long userId = currentUserProvider.getUserId();
+
+        // 対象年月のバリデーション（年・月の有効範囲チェック）
+        String[] yearMonth = request.getMonth().split("-");
+        int year = Integer.parseInt(yearMonth[0]);
+        int month = Integer.parseInt(yearMonth[1]);
+        dateValidator.validateYearMonth(year, month);
 
         // 2. 同一ユーザー・同一月の目標存在チェック
         if (goalRepository.findByUserIdAndTargetMonth(userId, request.getMonth()).isPresent()) {

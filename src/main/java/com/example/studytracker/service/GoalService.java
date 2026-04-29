@@ -3,6 +3,8 @@ package com.example.studytracker.service;
 import com.example.studytracker.dto.goal.GoalCreateRequest;
 import com.example.studytracker.dto.goal.GoalCreateResponse;
 import com.example.studytracker.dto.goal.GoalListResponse;
+import com.example.studytracker.dto.goal.GoalUpdateRequest;
+import com.example.studytracker.dto.goal.GoalUpdateResponse;
 import com.example.studytracker.entity.Goal;
 import com.example.studytracker.entity.User;
 import com.example.studytracker.exception.ConflictException;
@@ -146,6 +148,45 @@ public class GoalService {
         // 4. レスポンス返却
         return GoalListResponse.builder()
                 .goals(goalSummaries)
+                .build();
+    }
+
+    /**
+     * 目標を更新する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. 目標存在チェック（id + user_id）
+     * 3. 存在しない場合はエラー（404）を返却
+     * 4. targetMinutesを更新
+     * 5. 保存
+     * 6. レスポンス返却（id）
+     *
+     * @param id 目標ID
+     * @param request 目標更新リクエスト
+     * @return 目標更新レスポンス
+     * @throws ResourceNotFoundException 目標が存在しない場合
+     */
+    @Transactional
+    public GoalUpdateResponse update(Long id, GoalUpdateRequest request) {
+        // 1. 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // 2. 目標存在チェック（id + user_id）
+        Goal goal = goalRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("目標が見つかりません"));
+
+        // 4. targetMinutesを更新
+        goal.setTargetMinutes(request.getTargetMinutes());
+
+        // 5. 保存（updatedAtは@PreUpdateで自動設定）
+        Goal saved = goalRepository.save(goal);
+
+        log.debug("[{}] update result: id={}", this.getClass().getSimpleName(), saved.getId());
+
+        // 6. レスポンス返却
+        return GoalUpdateResponse.builder()
+                .id(saved.getId())
                 .build();
     }
 }

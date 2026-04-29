@@ -4,6 +4,8 @@ import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.goal.GoalCreateRequest;
 import com.example.studytracker.dto.goal.GoalCreateResponse;
 import com.example.studytracker.dto.goal.GoalListResponse;
+import com.example.studytracker.dto.goal.GoalUpdateRequest;
+import com.example.studytracker.dto.goal.GoalUpdateResponse;
 import com.example.studytracker.service.GoalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -88,6 +92,42 @@ public class GoalController {
     public ResponseEntity<SuccessResponse<GoalListResponse>> getAllGoals() {
         log.debug("[{}] getAllGoals request", this.getClass().getSimpleName());
         GoalListResponse response = goalService.getAllGoals();
+        return ResponseEntity.ok()
+                .body(SuccessResponse.success(response));
+    }
+
+    /**
+     * 目標を更新する
+     *
+     * PUT /goals/{id}
+     *
+     * @param id 目標ID
+     * @param request 目標更新リクエスト
+     * @return 目標更新レスポンス
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "目標更新", description = "指定された目標の学習時間を更新する")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "更新成功"
+            ),
+            @ApiResponse(
+                    responseCode = "400", description = "入力不正（バリデーションエラー）"
+            ),
+            @ApiResponse(
+                    responseCode = "401", description = "未認証"
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "データなし"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<SuccessResponse<GoalUpdateResponse>> update(
+            @PathVariable Long id,
+            @Valid @RequestBody GoalUpdateRequest request) {
+        log.debug("[{}] update request: id={}, targetMinutes={}",
+                this.getClass().getSimpleName(), id, request.getTargetMinutes());
+        GoalUpdateResponse response = goalService.update(id, request);
         return ResponseEntity.ok()
                 .body(SuccessResponse.success(response));
     }

@@ -82,4 +82,15 @@ public class Goal {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // --- 更新用セッター ---
+
+    /**
+     * 目標学習時間（分）を設定する
+     *
+     * @param targetMinutes 目標学習時間（分）
+     */
+    public void setTargetMinutes(Integer targetMinutes) {
+        this.targetMinutes = targetMinutes;
+    }
 }

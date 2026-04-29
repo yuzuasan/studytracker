@@ -2,6 +2,7 @@ package com.example.studytracker.service;
 
 import com.example.studytracker.dto.goal.GoalCreateRequest;
 import com.example.studytracker.dto.goal.GoalCreateResponse;
+import com.example.studytracker.dto.goal.GoalDeleteResponse;
 import com.example.studytracker.dto.goal.GoalListResponse;
 import com.example.studytracker.dto.goal.GoalUpdateRequest;
 import com.example.studytracker.dto.goal.GoalUpdateResponse;
@@ -187,6 +188,40 @@ public class GoalService {
         // 6. レスポンス返却
         return GoalUpdateResponse.builder()
                 .id(saved.getId())
+                .build();
+    }
+
+    /**
+     * 目標を削除する
+     *
+     * 処理フロー:
+     * 1. 認証情報からuserId取得
+     * 2. 目標存在チェック（id + user_id）
+     * 3. 存在しない場合はエラー（404）を返却
+     * 4. 目標を削除
+     * 5. レスポンス返却
+     *
+     * @param id 目標ID
+     * @return 目標削除レスポンス
+     * @throws ResourceNotFoundException 目標が存在しない場合
+     */
+    @Transactional
+    public GoalDeleteResponse delete(Long id) {
+        // 1. 認証情報からuserIdを取得
+        Long userId = currentUserProvider.getUserId();
+
+        // 2. 目標存在チェック（id + user_id）
+        Goal goal = goalRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("目標が見つかりません"));
+
+        // 4. 目標を削除
+        goalRepository.delete(goal);
+
+        log.debug("[{}] delete result: id={}", this.getClass().getSimpleName(), id);
+
+        // 5. レスポンス返却
+        return GoalDeleteResponse.builder()
+                .message("deleted")
                 .build();
     }
 }

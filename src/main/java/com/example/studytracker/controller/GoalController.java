@@ -3,6 +3,7 @@ package com.example.studytracker.controller;
 import com.example.studytracker.dto.common.SuccessResponse;
 import com.example.studytracker.dto.goal.GoalCreateRequest;
 import com.example.studytracker.dto.goal.GoalCreateResponse;
+import com.example.studytracker.dto.goal.GoalDeleteResponse;
 import com.example.studytracker.dto.goal.GoalListResponse;
 import com.example.studytracker.dto.goal.GoalUpdateRequest;
 import com.example.studytracker.dto.goal.GoalUpdateResponse;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -128,6 +130,37 @@ public class GoalController {
         log.debug("[{}] update request: id={}, targetMinutes={}",
                 this.getClass().getSimpleName(), id, request.getTargetMinutes());
         GoalUpdateResponse response = goalService.update(id, request);
+        return ResponseEntity.ok()
+                .body(SuccessResponse.success(response));
+    }
+
+    /**
+     * 目標を削除する
+     *
+     * DELETE /goals/{id}
+     *
+     * @param id 目標ID
+     * @return 目標削除レスポンス
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "目標削除", description = "指定された目標を削除する")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "削除成功"
+            ),
+            @ApiResponse(
+                    responseCode = "401", description = "未認証"
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "データなし"
+            )
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<SuccessResponse<GoalDeleteResponse>> delete(
+            @PathVariable Long id) {
+        log.debug("[{}] delete request: id={}",
+                this.getClass().getSimpleName(), id);
+        GoalDeleteResponse response = goalService.delete(id);
         return ResponseEntity.ok()
                 .body(SuccessResponse.success(response));
     }

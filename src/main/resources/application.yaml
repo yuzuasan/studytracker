@@ -28,6 +28,11 @@ jwt:
   secret: studytracker-secret-key
   expiration: 3600000
 
+github:
+  api:
+    base-url: https://api.github.com
+    token: ${GITHUB_TOKEN:}
+
 logging:
   level:
     root: INFO

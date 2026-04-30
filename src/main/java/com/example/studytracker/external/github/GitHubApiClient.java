@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -71,9 +72,16 @@ public class GitHubApiClient {
      */
     public List<CommitDto> getCommits(String owner, String repo, LocalDate from, LocalDate to) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
-            String since = from != null ? from.format(formatter) : null;
-            String until = to != null ? to.format(formatter) : null;
+            ZoneId zoneId = ZoneId.systemDefault();
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+            // ラムダ式で使用するため、初期化時に値を確定させる（実質的に final）
+            final String since = from != null
+                    ? from.atStartOfDay(zoneId).format(formatter)
+                    : null;
+            final String until = to != null
+                    ? to.atTime(23, 59, 59).atZone(zoneId).format(formatter)
+                    : null;
 
             return githubWebClient.get()
                     .uri(uriBuilder -> uriBuilder

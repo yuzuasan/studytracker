@@ -104,6 +104,19 @@ public interface StudyRecordRepository
             @Param("to") LocalDate to);
 
     /**
+     * ユーザーの学習日一覧を取得する（重複排除）
+     * ストリーク計算用に使用
+     *
+     * @param userId ユーザーID
+     * @return 学習日一覧（日付降順）
+     */
+    @Query("SELECT DISTINCT sr.studyDate " +
+           "FROM StudyRecord sr " +
+           "WHERE sr.user.id = :userId " +
+           "ORDER BY sr.studyDate DESC")
+    List<LocalDate> findDistinctStudyDatesByUserIdOrderByDateDesc(@Param("userId") Long userId);
+
+    /**
      * 日付別集計結果のプロジェクションインターフェース
      */
     interface DailyStudySummary {

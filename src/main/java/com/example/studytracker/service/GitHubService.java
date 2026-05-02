@@ -15,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * GitHub連携関連のビジネスロジックを担当するServiceクラス
@@ -68,29 +72,47 @@ public class GitHubService {
         List<com.example.studytracker.external.github.RepositoryDto> repositories =
                 gitHubApiClient.getRepositories(githubUsername);
 
-        // 5. 各リポジトリのコミット数を取得して合計
-        int totalCommits = 0;
+        // 5. 各リポジトリのコミット数を並列実行で取得して合計
+        // 最大並列数を5に固定してスレッドプールを作成
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
         LocalDate from = request.getFrom();
         LocalDate to = request.getTo();
 
-        for (com.example.studytracker.external.github.RepositoryDto repo : repositories) {
-            String owner = repo.getOwner().getLogin();
-            String repoName = repo.getName();
+        try {
+            // 各リポジトリのコミット取得を非同期タスクとして実行
+            List<CompletableFuture<Integer>> futures = repositories.stream()
+                    .map(repo -> CompletableFuture.supplyAsync(() -> {
+                        String owner = repo.getOwner().getLogin();
+                        String repoName = repo.getName();
 
-            List<com.example.studytracker.external.github.CommitDto> commits =
-                    gitHubApiClient.getCommits(owner, repoName, from, to);
+                        List<com.example.studytracker.external.github.CommitDto> commits =
+                                gitHubApiClient.getCommits(owner, repoName, from, to);
 
-            if (commits != null) {
-                totalCommits += commits.size();
-            }
+                        return commits != null ? commits.size() : 0;
+                    }, executorService))
+                    .toList();
+
+            // 全タスクの完了を待機
+            CompletableFuture<Void> allFutures = CompletableFuture.allOf(
+                    futures.toArray(new CompletableFuture[0]));
+
+            // 結果を集計
+            int totalCommits = allFutures.thenApply(v ->
+                    futures.stream()
+                            .map(CompletableFuture::join)
+                            .mapToInt(Integer::intValue)
+                            .sum()
+            ).join();
+
+            log.debug("[{}] getCommitCount result: totalCommits={}",
+                    this.getClass().getSimpleName(), totalCommits);
+
+            // 6. レスポンス返却
+            return GitHubCommitsResponse.builder()
+                    .totalCommits(totalCommits)
+                    .build();
+        } finally {
+            executorService.shutdown();
         }
-
-        log.debug("[{}] getCommitCount result: totalCommits={}",
-                this.getClass().getSimpleName(), totalCommits);
-
-        // 6. レスポンス返却
-        return GitHubCommitsResponse.builder()
-                .totalCommits(totalCommits)
-                .build();
     }
 }

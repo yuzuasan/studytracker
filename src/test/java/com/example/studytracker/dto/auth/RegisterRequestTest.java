@@ -195,7 +195,7 @@ class RegisterRequestTest {
         void passwordTooShort_ValidationError() {
             // 準備
             registerRequest.setUsername("testuser");
-            registerRequest.setPassword("pass");
+            registerRequest.setPassword("passwor");
             registerRequest.setGithubUsername("githubuser");
 
             // 実行

@@ -190,9 +190,9 @@ class GoalServiceTest {
         }
 
         @Test
-        @DisplayName("異常系：年月が範囲外の場合、BadRequestExceptionがスローされる")
-        void create_InvalidYearMonth_ThrowsBadRequestException() {
-            // 範囲外の年月を設定
+        @DisplayName("異常系：年が範囲外の場合、BadRequestExceptionがスローされる")
+        void create_InvalidYear_ThrowsBadRequestException() {
+            // 範囲外の年を設定
             GoalCreateRequest invalidRequest = new GoalCreateRequest();
             invalidRequest.setMonth("1999-01");
             TestUtil.setField(invalidRequest, "targetMinutes", 3000);
@@ -209,6 +209,30 @@ class GoalServiceTest {
 
             // モックの呼び出し検証
             verify(dateValidator, times(1)).validateYearMonth(1999, 1);
+            verify(goalRepository, never()).findByUserIdAndTargetMonth(anyLong(), any());
+            verify(goalRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("異常系：月が範囲外の場合、BadRequestExceptionがスローされる")
+        void create_InvalidMonth_ThrowsBadRequestException() {
+            // 範囲外の月を設定
+            GoalCreateRequest invalidRequest = new GoalCreateRequest();
+            invalidRequest.setMonth("2024-13");
+            TestUtil.setField(invalidRequest, "targetMinutes", 3000);
+
+            // モックの設定
+            when(currentUserProvider.getUserId()).thenReturn(1L);
+            doThrow(new BadRequestException("monthは1〜12の範囲で指定してください"))
+                    .when(dateValidator).validateYearMonth(2024, 13);
+
+            // 実行・検証
+            assertThatThrownBy(() -> goalService.create(invalidRequest))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage("monthは1〜12の範囲で指定してください");
+
+            // モックの呼び出し検証
+            verify(dateValidator, times(1)).validateYearMonth(2024, 13);
             verify(goalRepository, never()).findByUserIdAndTargetMonth(anyLong(), any());
             verify(goalRepository, never()).save(any());
         }

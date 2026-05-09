@@ -54,7 +54,7 @@ StudyTracker
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/your-username/studytracker.git
+git clone https://github.com/yuzuasan/studytracker.git
 cd studytracker
 ```
 
